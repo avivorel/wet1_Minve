@@ -5,9 +5,12 @@
 #ifndef SOLUTION_PLAYER_H
 #define SOLUTION_PLAYER_H
 
+class Team;
 
 class Player {
-
+    int player_id, team_id, games_played, goals, cards;
+    bool isGoalie;
+    Team* team;
 };
 
 
