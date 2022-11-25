@@ -16,12 +16,18 @@
 #define WORLDCUP23A1_H_
 
 #include "wet1util.h"
+#include "AVLTtree.h"
+#include "Player.h"
+#include "Team.h"
+#include <memory>
+#include <iostream>
+
 
 class world_cup_t {
 private:
-	//
-	// Here you may add anything you want
-	//
+    AVLTree<std::shared_ptr<Player*>> all_players;
+    AVLTree<std::shared_ptr<Team*>> all_teams;
+
 	
 public:
 	// <DO-NOT-MODIFY> {
