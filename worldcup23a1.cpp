@@ -13,7 +13,7 @@ world_cup_t::~world_cup_t()
 
 StatusType world_cup_t::add_team(int teamId, int points)
 {
-
+	// TODO: Your code goes here
 	return StatusType::SUCCESS;
 }
 
