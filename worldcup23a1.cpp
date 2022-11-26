@@ -1,4 +1,5 @@
 #include "worldcup23a1.h"
+#include <memory>
 
 world_cup_t::world_cup_t()
 {
@@ -13,13 +14,22 @@ world_cup_t::~world_cup_t()
 
 StatusType world_cup_t::add_team(int teamId, int points)
 {
-	// TODO: Your code goes here
+    if(teamId < 0 or points< 0){
+        return StatusType::INVALID_INPUT;
+    }
+	std::shared_ptr<Team> newTeam(new Team(teamId,points));
+    if (newTeam == nullptr){
+        return StatusType::ALLOCATION_ERROR;
+    }
+    if(!this->all_teams.Insert(newTeam)){
+        return StatusType::FAILURE;
+    }
 	return StatusType::SUCCESS;
 }
 
 StatusType world_cup_t::remove_team(int teamId)
 {
-	// TODO: Your code goes here
+	if()
 	return StatusType::FAILURE;
 }
 

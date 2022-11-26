@@ -4,7 +4,7 @@
 
 #ifndef SOLUTION_PLAYER_H
 #define SOLUTION_PLAYER_H
-
+#include <memory>
 class Team;
 
 class Player {
@@ -18,7 +18,7 @@ public:
     int getGoals() const;
     int getCards() const;
     bool isGK() const;
-    static int comparePlayerId(const Player& player1, const Player& player2);
+    static int comparePlayerId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b);
 };
 
 

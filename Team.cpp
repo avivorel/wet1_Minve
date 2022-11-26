@@ -3,10 +3,10 @@
 //
 
 #include "Team.h"
-#include "Player.h"
+#include "AVLTtree.h"
+#include <memory>
 
-
-Team::Team(int teamid, int points) : players(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId)), points(points), team_id(teamid) {};
+Team::Team(int teamId, int points) : games_played(0) , points(points), team_id(teamId), players(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId)) {};
 
 int Team::getId() const {
     return this->team_id;

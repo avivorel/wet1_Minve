@@ -17,7 +17,7 @@ class Team {
     int games_played;
 
 public:
-    Team(int teamid, int points);
+    explicit Team(int teamid, int points);
     int getGamesPlayed() const;
     int getId() const;
     int getPoints() const;
