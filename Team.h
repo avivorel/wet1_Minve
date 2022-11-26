@@ -11,9 +11,19 @@
 #include <iostream>
 
 class Team {
-    AVLTree<std::shared_ptr<Player*>> players;
+
+    AVLTree<std::shared_ptr<Player>> *players;
     int team_id, points;
     int games_played;
+
+public:
+    Team(int teamid, int points);
+    int getGamesPlayed() const;
+    int getId() const;
+    int getPoints() const;
+    Player* findPlayer(int playerid) const;
+
+
 };
 
 
