@@ -3,7 +3,8 @@
 
 world_cup_t::world_cup_t()
 {
-	// TODO: Your code goes here
+	all_players = new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId);
+    all_teams = new AVLTree<std::shared_ptr<Team>>(Team::compareTeamId);
 }
 
 world_cup_t::~world_cup_t()
@@ -29,8 +30,16 @@ StatusType world_cup_t::add_team(int teamId, int points)
 
 StatusType world_cup_t::remove_team(int teamId)
 {
-	if()
-	return StatusType::FAILURE;
+    if (teamId<0){
+        return StatusType::INVALID_INPUT;
+    }
+	std::shared_ptr<Team> toremove(new Team(teamId,0))
+    auto *teamToRemove = this->all_teams->Find(toremove);
+    if (teamToRemove == nullptr or !(teamToRemove->GetValue()->isEmpty())){
+        return StatusType::FAILURE;
+    }
+    this->all_teams->Remove(teamToRemove->GetValue());
+    free(teamToRemove->GetValue()); // לבדוק אם צריך ונכון
 }
 
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,

@@ -22,7 +22,8 @@ public:
     int getId() const;
     int getPoints() const;
     Player* findPlayer(int playerid) const;
-
+    bool isEmpty() const;
+    static int compareTeamId(const std::shared_ptr<Team> &a, const std::shared_ptr<Team> &b);
 
 };
 

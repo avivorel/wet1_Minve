@@ -19,3 +19,14 @@ int Team::getGamesPlayed() const {
 int Team::getPoints() const {
     return this->points;
 }
+
+int Team::compareTeamId(const std::shared_ptr<Team> &a, const std::shared_ptr<Team> &b) {
+    if(a->team_id > b->team_id) return 1;
+    if(a->team_id < b->team_id) return -1;
+    return 0;
+}
+
+bool Team::isEmpty() const {
+    if (this->players->IsEmpty()) return true;
+    return false;
+}
