@@ -23,6 +23,8 @@ public:
     int getPoints() const;
     Player* findPlayer(int playerid) const;
     bool isEmpty() const;
+    bool add_player(std::shared_ptr<Player> playerToAdd); // true if succeeds
+    bool removePlayer(std::shared_ptr<Player> toRemove);
     static int compareTeamId(const std::shared_ptr<Team> &a, const std::shared_ptr<Team> &b);
 
 };

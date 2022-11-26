@@ -39,19 +39,44 @@ StatusType world_cup_t::remove_team(int teamId)
         return StatusType::FAILURE;
     }
     this->all_teams->Remove(teamToRemove->GetValue());
-    free(teamToRemove->GetValue()); // לבדוק אם צריך ונכון
 }
 
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
                                    int goals, int cards, bool goalKeeper)
 {
-	// TODO: Your code goes here
-	return StatusType::SUCCESS;
+	if(teamId <= 0 or playerId <= 0 or gamesPlayed<0 or goals<0 or cards< 0){
+        return StatusType::INVALID_INPUT;
+    }
+    if (gamesPlayed == 0 and (goals>0 or cards > 0)) return StatusType::INVALID_INPUT;
+    std::shared_ptr<Player> player(new Player(playerId, teamId,gamesPlayed,goals,cards,goalKeeper));
+    if (player == nullptr)
+        return StatusType::ALLOCATION_ERROR;
+    auto *foundPlayer = this->all_players->Find(player);
+    if (foundPlayer != nullptr){
+        return StatusType::FAILURE;
+    }
+    std::shared_ptr<Team> team(new Team(teamId,0));
+    auto *foundteam = this->all_teams->Find(team);
+    if (foundteam == nullptr){
+        return StatusType::FAILURE;
+    }
+    player->setTeam(foundteam->GetValue());
+    if (foundteam->GetValue()->add_player(player))
+	    return StatusType::SUCCESS;
+    return StatusType::FAILURE;
 }
 
 StatusType world_cup_t::remove_player(int playerId)
 {
-	// TODO: Your code goes here
+	if (playerId<= 0)
+        return StatusType::INVALID_INPUT;
+    std::shared_ptr<Player> toRemove(new Player(playerId,0,0,0,0,0));
+    auto *foundPlayer = this->all_players->Find(toRemove);
+    if (foundPlayer == nullptr)
+        return StatusType::FAILURE;
+    std::shared_ptr<Team> *team = foundPlayer->GetValue()->getTeam();
+    (*team)->removePlayer(foundPlayer->GetValue());
+    foundPlayer->GetValue()->setTeam(nullptr);7
 	return StatusType::SUCCESS;
 }
 

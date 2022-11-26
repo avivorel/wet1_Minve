@@ -30,3 +30,13 @@ bool Team::isEmpty() const {
     if (this->players->IsEmpty()) return true;
     return false;
 }
+
+bool Team::add_player(std::shared_ptr<Player> playerToAdd) {
+    if (this->players->Insert(playerToAdd))
+        return true;
+    return false;
+}
+
+bool Team::removePlayer(std::shared_ptr<Player> toRemove) {
+    this->players->Remove(toRemove);
+}
