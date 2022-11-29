@@ -53,6 +53,10 @@ public:
 
 };
 
+
+
+
+
 template<class T> //to search online!!!!!!!!!!
 class AVLTree {
 
@@ -391,17 +395,17 @@ void AVLTree<T>::RotateByNeeded(AVLNode<T> *node) {
     //if an LL is needed
     if (balance_root == 2 && (node->GetLeft())->GetBalanceFactor() >= 0) {
         RotateRight(node);
-    //if an LR is needed
+        //if an LR is needed
     } else if (balance_root == 2 && (node->GetLeft())->GetBalanceFactor() == -1) {
         RotateLeft(node->GetLeft());
         RotateRight(node);
         return;
-    //if an RL is needed
+        //if an RL is needed
     } else if (balance_root == -2 && (node->GetRight())->GetBalanceFactor() == 1) {
         RotateRight(node->GetRight());
         RotateLeft(node);
         return;
-    //if an RR is needed
+        //if an RR is needed
     } else if (balance_root == -2 && (node->GetRight())->GetBalanceFactor() <= 0) {
         RotateLeft(node);
         return;
