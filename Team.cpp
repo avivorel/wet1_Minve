@@ -6,7 +6,7 @@
 #include "AVLTtree.h"
 #include <memory>
 
-Team::Team(int teamId, int points) : games_played(0) , points(points), team_id(teamId), players(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId)) {};
+Team::Team(int teamId, int points) :  numberOfGK(0),numberOfPlayers(0),hasGK(false),games_played(0) , points(points), team_id(teamId), players(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId)) {};
 
 int Team::getId() const {
     return this->team_id;
@@ -32,11 +32,24 @@ bool Team::isEmpty() const {
 }
 
 bool Team::add_player(std::shared_ptr<Player> playerToAdd) {
-    if (this->players->Insert(playerToAdd))
+    if (this->players->Insert(playerToAdd)) {
+        this->numberOfPlayers = this->numberOfPlayers + 1;
+        if (playerToAdd->isGK()){
+            this->hasGK = true;
+            this->numberOfGK += 1;
+        }
         return true;
+    }
     return false;
 }
 
 bool Team::removePlayer(std::shared_ptr<Player> toRemove) {
     this->players->Remove(toRemove);
+    this->numberOfPlayers = this->numberOfPlayers -1;
+    if (toRemove->isGK()){
+        this->numberOfGK += -1;
+        if (numberOfGK<= 0){
+            this->hasGK = false;
+        }
+    }
 }

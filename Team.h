@@ -16,6 +16,9 @@ class Team {
     int team_id;
     int points;
     int games_played;
+    int numberOfPlayers;
+    int numberOfGK;
+    bool hasGK;
 
 public:
     explicit Team(int teamid, int points);

@@ -75,7 +75,6 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
     {
         return StatusType::SUCCESS;
     }
-
     return StatusType::FAILURE;
 }
 
@@ -155,23 +154,41 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
     {
         return StatusType::FAILURE;
     }
-
-    if (team1->GetValue().)
-
-
     return StatusType::SUCCESS;
 }
 
 output_t<int> world_cup_t::get_num_played_games(int playerId)
 {
-    if(player)
-    return 22;
+    if(playerId <= 0){
+        return StatusType::INVALID_INPUT;
+    }
+    std::shared_ptr<Player> player(new Player(playerId,0,0,0,0,0));
+    auto *foundplayer = this->all_players->Find(player);
+    if (foundplayer == nullptr){
+        return StatusType::FAILURE;
+    }
+    if (player == nullptr){
+        return StatusType::ALLOCATION_ERROR;
+    }
+    else{
+        return foundplayer->GetValue()->getGamesPlayed();
+    }
 }
 
 output_t<int> world_cup_t::get_team_points(int teamId)
 {
-    // TODO: Your code goes here
-    return 30003;
+    if (teamId<=0){
+        return StatusType::INVALID_INPUT;
+    }
+    std::shared_ptr<Team> team(new Team(teamId,0));
+    if (team == nullptr){
+        return StatusType::ALLOCATION_ERROR;
+    }
+    auto *foundteam = this->all_teams->Find(team);
+    if (foundteam == nullptr) {
+        return StatusType::FAILURE;
+    }
+    return foundteam->GetValue()->getPoints();
 }
 
 StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
