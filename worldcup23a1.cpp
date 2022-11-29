@@ -164,7 +164,7 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 
 output_t<int> world_cup_t::get_num_played_games(int playerId)
 {
-    // TODO: Your code goes here
+    if(player)
     return 22;
 }
 
