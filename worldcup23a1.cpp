@@ -95,8 +95,8 @@ StatusType world_cup_t::remove_player(int playerId)
     {
         return StatusType::FAILURE;
     }
-    std::shared_ptr<Team> *team = foundPlayer->GetValue()->getTeam();
-    (*team)->removePlayer(foundPlayer->GetValue());
+    std::shared_ptr<Team> team = foundPlayer->GetValue()->getTeam();
+    (team)->removePlayer(foundPlayer->GetValue());
     foundPlayer->GetValue()->setTeam(nullptr);
     return StatusType::SUCCESS;
 }
@@ -150,19 +150,24 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
     auto *team1 = this->all_teams->Find(checkteam1);
     auto *team2 = this->all_teams->Find(checkteam2);
 
-    if (team1 == nullptr || team2 == nullptr )
+    if (team1 == nullptr || team2 == nullptr || (!(team1->GetValue()->hasGk())) ||team1->GetValue()->getNumOfPlayers()<11
+    || (!(team2->GetValue()->hasGk())) || team2->GetValue()->getNumOfPlayers() <11)
     {
         return StatusType::FAILURE;
     }
+
+    
     return StatusType::SUCCESS;
 }
 
 output_t<int> world_cup_t::get_num_played_games(int playerId)
 {
-    if(playerId <= 0){
+    if(playerId <= 0)
+    {
         return StatusType::INVALID_INPUT;
     }
     std::shared_ptr<Player> player(new Player(playerId,0,0,0,0,0));
+
     auto *foundplayer = this->all_players->Find(player);
     if (foundplayer == nullptr){
         return StatusType::FAILURE;
@@ -229,4 +234,3 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
     // TODO: Your code goes here
     return 2;
 }
-

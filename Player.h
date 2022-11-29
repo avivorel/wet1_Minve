@@ -14,7 +14,7 @@ class Player {
     int goals;
     int cards;
     bool isGoalie;
-    std::shared_ptr<Team> *team; //// why *???
+    std::shared_ptr<Team> team; //// why *???
 public:
     Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper);
     int getId() const;
@@ -28,7 +28,7 @@ public:
     bool isGK() const;
     static int comparePlayerId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b);
     void setTeam(std::shared_ptr<Team> newteam);
-    std::shared_ptr<Team>* getTeam();
+    std::shared_ptr<Team> getTeam();
 };
 
 

@@ -6,8 +6,9 @@
 #include <memory>
 
 
-Player::Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper) : player_id(playerId), team_id(teamId), games_played(gamesplayed),
-                                                                                                     goals(goals), cards(cards), isGoalie(isGoalKeeper), team(nullptr) {};
+Player::Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper) :
+player_id(playerId), team_id(teamId), games_played(gamesplayed),goals(goals), cards(cards), isGoalie(isGoalKeeper),
+team(nullptr) {};
 
 int Player::getId() const {
     return this->player_id;
@@ -15,10 +16,10 @@ int Player::getId() const {
 
 void Player::setTeam(std::shared_ptr<Team> newteam)
 {
-    this->team = &newteam;
+    this->team = newteam;
 }
 
-std::shared_ptr<Team>* Player::getTeam() {
+std::shared_ptr<Team> Player::getTeam() {
     return this->team;
 }
 

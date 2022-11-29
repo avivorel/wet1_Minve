@@ -24,6 +24,8 @@ public:
     explicit Team(int teamid, int points);
     int getGamesPlayed() const;
     int getId() const;
+    bool hasGk() const;
+    int getNumOfPlayers() const;
     int getPoints() const;
     Player* findPlayer(int playerid) const;
     bool isEmpty() const;
