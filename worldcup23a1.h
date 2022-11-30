@@ -26,6 +26,7 @@
 class world_cup_t {
 private:
     AVLTree<std::shared_ptr<Player>> *all_players;
+    AVLTree<std::shared_ptr<Player>> *all_players_by_goals;
     AVLTree<std::shared_ptr<Team>> *all_teams;
     int numberOfPlayers;
 

@@ -13,6 +13,7 @@
 class Team {
 
     AVLTree<std::shared_ptr<Player>> *players;
+    AVLTree<std::shared_ptr<Player>> *players_by_goals;
     int team_id;
     int points;
     int games_played;

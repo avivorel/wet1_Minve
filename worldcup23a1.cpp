@@ -5,6 +5,7 @@ world_cup_t::world_cup_t()
 {
     all_players = new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId);
     all_teams = new AVLTree<std::shared_ptr<Team>>(Team::compareTeamId);
+    all_players_by_goals = new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerGoalsCardsId);
     numberOfPlayers = 0;
 }
 
@@ -74,6 +75,8 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
     player->setTeam(foundteam->GetValue());
     if (foundteam->GetValue()->add_player(player))
     {
+        all_players->Insert(player);
+        all_players_by_goals->Insert(player);
         numberOfPlayers += 1;
         return StatusType::SUCCESS;
     }
@@ -99,6 +102,8 @@ StatusType world_cup_t::remove_player(int playerId)
     }
     std::shared_ptr<Team> team = foundPlayer->GetValue()->getTeam();
     (team)->removePlayer(foundPlayer->GetValue());
+    all_players->Remove(foundPlayer->GetValue());
+    all_players_by_goals->Remove(foundPlayer->GetValue());
     foundPlayer->GetValue()->setTeam(nullptr);
     return StatusType::SUCCESS;
 }

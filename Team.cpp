@@ -7,7 +7,8 @@
 #include <memory>
 
 Team::Team(int teamId, int points):team_id(teamId),points(points),games_played(0),numberOfPlayers(0),numberOfGK(0),
-hasGK(false) ,players(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId)){};
+hasGK(false) ,players(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId))
+,players_by_goals(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerGoalsCardsId)){};
 
 int Team::getId() const {
     return this->team_id;
@@ -33,7 +34,7 @@ bool Team::isEmpty() const {
 }
 
 bool Team::add_player(std::shared_ptr<Player> playerToAdd) {
-    if (this->players->Insert(playerToAdd)) {
+    if (this->players->Insert(playerToAdd) and this->players_by_goals->Insert(playerToAdd)) {
         this->numberOfPlayers = this->numberOfPlayers + 1;
         if (playerToAdd->isGK()){
             this->hasGK = true;
@@ -46,6 +47,7 @@ bool Team::add_player(std::shared_ptr<Player> playerToAdd) {
 
 bool Team::removePlayer(std::shared_ptr<Player> toRemove) {
     this->players->Remove(toRemove);
+    this->players_by_goals->Remove(toRemove);
     this->numberOfPlayers = this->numberOfPlayers -1;
     if (toRemove->isGK()){
         this->numberOfGK += -1;

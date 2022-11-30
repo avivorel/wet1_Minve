@@ -27,6 +27,7 @@ public:
     int setCards(int cards);
     bool isGK() const;
     static int comparePlayerId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b);
+    static int comparePlayerGoalsCardsId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b);
     void setTeam(std::shared_ptr<Team> newteam);
     std::shared_ptr<Team> getTeam();
 };

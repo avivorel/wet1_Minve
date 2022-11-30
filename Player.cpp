@@ -67,3 +67,24 @@ int Player::comparePlayerId(const std::shared_ptr<Player> &player1, const std::s
     else if(player1->getId() < player2->getId() ) return -1;
     return 0;
 }
+
+int Player::comparePlayerGoalsCardsId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b) {
+    if (a->goals > b->goals){
+        return 1;
+    }
+    else if (a->goals == b->goals){
+        if(a->cards > b->cards){
+            return 1;
+        }
+        else if (a->cards == b->cards){
+            if (a->player_id == b->player_id){
+                return 0;
+            }
+            else{
+                return a->player_id < b->player_id ? 1 : -1;
+            }
+        }
+        return -1;
+    }
+    return -1;
+}
