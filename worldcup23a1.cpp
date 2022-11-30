@@ -81,12 +81,16 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
         if (topScorer == nullptr){
             topScorer = player;
         }
-        else{
-            if (topScorer->getGoals() < player->getGoals()){
+        else
+        {
+            if (topScorer->getGoals() < player->getGoals())
+            {
                 topScorer = player;
             }
         }
         numberOfPlayers += 1;
+        player->getTeam()->addTo_PM_Equation(goals-cards);
+        player->addTo_GamesPlayed((-1)*(player->getTeam()->getGamesPlayed())); // good?
         return StatusType::SUCCESS;
     }
     return StatusType::FAILURE;
@@ -110,11 +114,16 @@ StatusType world_cup_t::remove_player(int playerId)
         return StatusType::FAILURE;
     }
     std::shared_ptr<Team> team = foundPlayer->GetValue()->getTeam();
+    team->addTo_PM_Equation(-foundPlayer->GetValue()->getGoals()+foundPlayer->GetValue()->getCards()); //// need??
     (team)->removePlayer(foundPlayer->GetValue());
     all_players->Remove(foundPlayer->GetValue());
     all_players_by_goals->Remove(foundPlayer->GetValue());
     foundPlayer->GetValue()->setTeam(nullptr);
+    numberOfPlayers -= 1;
+
     return StatusType::SUCCESS;
+
+    // עומד בסביבוכיות? לבדוק את remove
 }
 
 StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,int scoredGoals, int cardsReceived)
@@ -137,15 +146,11 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,int sc
     }
     std::shared_ptr<Player> player=foundPlayer->GetValue();
 
-    if (gamesPlayed != 0)
-    {
-        player->setGamesPlayed(player->getGamesPlayed()+ gamesPlayed);
-        /// add?
-    }
-
+    player->addTo_GamesPlayed(gamesPlayed);
     player->setGoals(player->getGoals()+ scoredGoals);
     player->setCards(player->getCards()+ cardsReceived);
-    numberOfPlayers -= 1;
+    player->getTeam()->addTo_PM_Equation(scoredGoals-cardsReceived);
+
     return StatusType::SUCCESS;
 }
 
@@ -167,12 +172,32 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
     auto *team2 = this->all_teams->Find(checkteam2);
 
     if (team1 == nullptr || team2 == nullptr || (!(team1->GetValue()->hasGk())) ||team1->GetValue()->getNumOfPlayers()<11
-    || (!(team2->GetValue()->hasGk())) || team2->GetValue()->getNumOfPlayers() <11)
+        || (!(team2->GetValue()->hasGk())) || team2->GetValue()->getNumOfPlayers() <11)
     {
         return StatusType::FAILURE;
     }
 
-    
+    int eq_team1 = team1->GetValue()->getPoints()+team1->GetValue()->get_PM_Equation() ;
+    int eq_team2 = team2->GetValue()->getPoints()+team2->GetValue()->get_PM_Equation() ;
+
+    if (eq_team1 > eq_team2)
+    {
+        team1->GetValue()->addTo_points(3);
+    }
+    else
+        if (eq_team1 == eq_team2)
+        {
+            team1->GetValue()->addTo_points(1);
+            team2->GetValue()->addTo_points(1);
+
+        } else
+        {
+            team2->GetValue()->addTo_points(3);
+        }
+
+    team1->GetValue()->addTo_GamesPlayed(1);
+    team2->GetValue()->addTo_GamesPlayed(1);
+
     return StatusType::SUCCESS;
 }
 
@@ -214,6 +239,13 @@ output_t<int> world_cup_t::get_team_points(int teamId)
 StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 {
     // TODO: Your code goes here
+
+
+
+
+     ////add!!
+     
+
     return StatusType::SUCCESS;
 }
 

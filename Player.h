@@ -14,17 +14,18 @@ class Player {
     int goals;
     int cards;
     bool isGoalie;
-    std::shared_ptr<Team> team; //// why *???
+    std::shared_ptr<Team>  team; //// need *???
 public:
     Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper);
+    // להוסיף הורס
     int getId() const;
     int getTeamId() const;
     int getGamesPlayed() const;
     int getGoals() const;
     int getCards() const;
-    int setGamesPlayed(int games);
-    int setGoals(int goals);
-    int setCards(int cards);
+    void addTo_GamesPlayed(int games);
+    void setGoals(int goals);
+    void setCards(int cards);
     bool isGK() const;
     static int comparePlayerId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b);
     static int comparePlayerGoalsCardsId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b);
