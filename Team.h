@@ -14,6 +14,7 @@ class Team {
 
     AVLTree<std::shared_ptr<Player>> *players;
     AVLTree<std::shared_ptr<Player>> *players_by_goals;
+    std::shared_ptr<Player> topScorer;
     int team_id;
     int points;
     int games_played;
@@ -33,6 +34,7 @@ public:
     bool add_player(std::shared_ptr<Player> playerToAdd); // true if succeeds
     bool removePlayer(std::shared_ptr<Player> toRemove);
     static int compareTeamId(const std::shared_ptr<Team> &a, const std::shared_ptr<Team> &b);
+    int getTopScorer() const;
 
 };
 

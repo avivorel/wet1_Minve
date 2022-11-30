@@ -8,7 +8,7 @@
 
 Team::Team(int teamId, int points):team_id(teamId),points(points),games_played(0),numberOfPlayers(0),numberOfGK(0),
 hasGK(false) ,players(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId))
-,players_by_goals(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerGoalsCardsId)){};
+,players_by_goals(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerGoalsCardsId)), topScorer(nullptr){};
 
 int Team::getId() const {
     return this->team_id;
@@ -35,6 +35,14 @@ bool Team::isEmpty() const {
 
 bool Team::add_player(std::shared_ptr<Player> playerToAdd) {
     if (this->players->Insert(playerToAdd) and this->players_by_goals->Insert(playerToAdd)) {
+        if (topScorer == nullptr){
+            this->topScorer = playerToAdd;
+        }
+        else{
+            if (this->topScorer->getGoals() < playerToAdd->getGoals()){
+                this->topScorer = playerToAdd;
+            }
+        }
         this->numberOfPlayers = this->numberOfPlayers + 1;
         if (playerToAdd->isGK()){
             this->hasGK = true;
@@ -65,5 +73,9 @@ bool Team::hasGk() const
 int  Team::getNumOfPlayers() const
 {
     return this->numberOfPlayers;
+}
+
+int Team::getTopScorer() const {
+    return this->topScorer->getId();
 }
 

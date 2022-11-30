@@ -6,6 +6,7 @@ world_cup_t::world_cup_t()
     all_players = new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId);
     all_teams = new AVLTree<std::shared_ptr<Team>>(Team::compareTeamId);
     all_players_by_goals = new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerGoalsCardsId);
+    topScorer = nullptr;
     numberOfPlayers = 0;
 }
 
@@ -77,6 +78,14 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
     {
         all_players->Insert(player);
         all_players_by_goals->Insert(player);
+        if (topScorer == nullptr){
+            topScorer = player;
+        }
+        else{
+            if (topScorer->getGoals() < player->getGoals()){
+                topScorer = player;
+            }
+        }
         numberOfPlayers += 1;
         return StatusType::SUCCESS;
     }
@@ -210,8 +219,26 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 
 output_t<int> world_cup_t::get_top_scorer(int teamId)
 {
-    // TODO: Your code goes here
-    return 2008;
+    if (teamId == 0){
+        return StatusType::INVALID_INPUT;
+    }
+    if (teamId>0){
+        std::shared_ptr<Team> team(new Team(teamId,0));
+        auto *foundTeam = this->all_teams->Find(team);
+        if (foundTeam == nullptr){
+            return StatusType::FAILURE;
+        }
+        if (foundTeam->GetValue()->getNumOfPlayers() == 0){
+            return StatusType::FAILURE;
+        }
+        return foundTeam->GetValue()->getTopScorer();
+    }
+    else{
+        if (topScorer == nullptr){
+            return StatusType::FAILURE;
+        }
+        return topScorer->getId();
+    }
 }
 
 output_t<int> world_cup_t::get_all_players_count(int teamId)
