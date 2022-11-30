@@ -5,6 +5,7 @@ world_cup_t::world_cup_t()
 {
     all_players = new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId);
     all_teams = new AVLTree<std::shared_ptr<Team>>(Team::compareTeamId);
+    numberOfPlayers = 0;
 }
 
 world_cup_t::~world_cup_t()
@@ -73,6 +74,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
     player->setTeam(foundteam->GetValue());
     if (foundteam->GetValue()->add_player(player))
     {
+        numberOfPlayers += 1;
         return StatusType::SUCCESS;
     }
     return StatusType::FAILURE;
@@ -129,7 +131,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,int sc
 
     player->setGoals(player->getGoals()+ scoredGoals);
     player->setCards(player->getCards()+ cardsReceived);
-
+    numberOfPlayers -= 1;
     return StatusType::SUCCESS;
 }
 
@@ -167,13 +169,12 @@ output_t<int> world_cup_t::get_num_played_games(int playerId)
         return StatusType::INVALID_INPUT;
     }
     std::shared_ptr<Player> player(new Player(playerId,0,0,0,0,0));
-
+    if (player == nullptr){
+        return StatusType::ALLOCATION_ERROR;
+    }
     auto *foundplayer = this->all_players->Find(player);
     if (foundplayer == nullptr){
         return StatusType::FAILURE;
-    }
-    if (player == nullptr){
-        return StatusType::ALLOCATION_ERROR;
     }
     else{
         return foundplayer->GetValue()->getGamesPlayed();
@@ -210,9 +211,21 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
 
 output_t<int> world_cup_t::get_all_players_count(int teamId)
 {
-    // TODO: Your code goes here
-    static int i = 0;
-    return (i++==0) ? 11 : 2;
+    std::shared_ptr<Team> team(new Team(teamId,0));
+    if (teamId == 0){
+        return StatusType::INVALID_INPUT;
+    }
+    if (teamId > 0){
+        auto *foundTeam = this->all_teams->Find(team);
+        if (foundTeam == nullptr) return StatusType::FAILURE;
+        else{
+            return foundTeam->GetValue()->getNumOfPlayers();
+        }
+    }
+    else{
+        return this->numberOfPlayers;
+    }
+
 }
 
 StatusType world_cup_t::get_all_players(int teamId, int *const output)
