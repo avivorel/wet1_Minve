@@ -59,6 +59,7 @@ bool Team::isEmpty() const
 bool Team::add_player(std::shared_ptr<Player> playerToAdd)
 {
     if (this->players->Insert(playerToAdd) and this->players_by_goals->Insert(playerToAdd)) {
+        playerToAdd->setGamesPlayed(playerToAdd->getGamesPlayed()-this->games_played);
         if (topScorer == nullptr){
             this->topScorer = playerToAdd;
         }
@@ -81,6 +82,7 @@ bool Team::removePlayer(std::shared_ptr<Player> toRemove)
 {
     this->players->Remove(toRemove);
     this->players_by_goals->Remove(toRemove);
+    toRemove->setGamesPlayed(this->games_played+toRemove->getGamesPlayed());
     this->numberOfPlayers = this->numberOfPlayers -1;
     if (toRemove->isGK()){
         this->numberOfGK += -1;
@@ -103,4 +105,13 @@ int  Team::getNumOfPlayers() const
 int Team::getTopScorer() const
 {
     return this->topScorer->getId();
+}
+
+void Team::PlayersToArray(int number, std::shared_ptr<Player> *playersArray) {
+    if (number == 0){ // העץ לפי אידי
+        this->players->ToArray(playersArray);
+    }
+    else if (number == 1) { // העץ לפי גולים
+        this->players_by_goals->ToArray(playersArray);
+    }
 }

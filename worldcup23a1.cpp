@@ -238,15 +238,33 @@ output_t<int> world_cup_t::get_team_points(int teamId)
 
 StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 {
-    // TODO: Your code goes here
+    if (teamId1 <= 0 or teamId2 <= 0 or newTeamId <= 0 or teamId2 == teamId1){
+        return StatusType::INVALID_INPUT;
+    }
+    std::shared_ptr<Team> team1(new Team(teamId1,0));
+    std::shared_ptr<Team> team2(new Team(teamId2,0));
+    if (team1 == nullptr or team2 == nullptr){
+        return StatusType::ALLOCATION_ERROR;
+    }
+    auto *foundTeam1 = this->all_teams->Find(team1);
+    auto *foundTeam2 = this->all_teams->Find(team2);
+    if(foundTeam1 == nullptr or foundTeam2== nullptr){
+        return StatusType::FAILURE;
+    }
+    std::shared_ptr<Team> newTeam(new Team(newTeamId,0));
+    if (newTeam == nullptr){
+        return StatusType::ALLOCATION_ERROR;
+    }
+    std::shared_ptr<Player> allPlayers[foundTeam1->GetValue()->getNumOfPlayers()+foundTeam2->GetValue()->getNumOfPlayers()] ;
+    std::shared_ptr<Player> team1_players_by_id[foundTeam1->GetValue()->getNumOfPlayers()];
+    std::shared_ptr<Player> team1_players_by_goals[foundTeam1->GetValue()->getNumOfPlayers()];
+    std::shared_ptr<Player> team2_players_by_id[foundTeam2->GetValue()->getNumOfPlayers()];
+    std::shared_ptr<Player> team2_players_by_goals[foundTeam2->GetValue()->getNumOfPlayers()];
+    foundTeam1->GetValue()->PlayersToArray(0,team1_players_by_id);
+    foundTeam1->GetValue()->PlayersToArray(1,team1_players_by_goals);
+    foundTeam2->GetValue()->PlayersToArray(0,team2_players_by_id);
+    foundTeam2->GetValue()->PlayersToArray(1,team2_players_by_goals);
 
-
-
-
-     ////add!!
-     
-
-    return StatusType::SUCCESS;
 }
 
 output_t<int> world_cup_t::get_top_scorer(int teamId)
@@ -294,10 +312,44 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
 
 StatusType world_cup_t::get_all_players(int teamId, int *const output)
 {
-    // TODO: Your code goes here
-    output[0] = 4001;
-    output[1] = 4002;
-    return StatusType::SUCCESS;
+    if (output == nullptr or teamId == 0){
+        return StatusType::INVALID_INPUT;
+    }
+    if (teamId>0){
+        std::shared_ptr<Team> team(new Team(teamId,0));
+        if (team == nullptr){
+            return StatusType::ALLOCATION_ERROR;
+        }
+        auto *foundTeam = this->all_teams->Find(team);
+        if (foundTeam == nullptr){
+            return StatusType::FAILURE;
+        }
+        else{
+            if (foundTeam->GetValue()->isEmpty()){
+                return StatusType::FAILURE;
+            }
+            else{
+                int numbOfPlayers = foundTeam->GetValue()->getNumOfPlayers();
+                std::shared_ptr<Player> players[numbOfPlayers];
+                foundTeam->GetValue()->PlayersToArray(1,players);
+                for (int i = 0; i<numbOfPlayers; i++){
+                    output[i] = players[numbOfPlayers-i-1]->getId();
+                }
+            }
+        }
+    }
+    else{
+        if (this->all_players_by_goals->IsEmpty()){
+            return StatusType::FAILURE;
+        }
+        else{
+            std::shared_ptr<Player> players[numberOfPlayers];
+            this->all_players_by_goals->ToArray(players);
+            for (int i = 0; i<numberOfPlayers; i++){
+                output[i] = players[numberOfPlayers-i-1]->getId();
+            }
+        }
+    }
 }
 
 output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)

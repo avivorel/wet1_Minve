@@ -30,8 +30,7 @@ int Player::getTeamId() const
 
 int Player::getGamesPlayed() const
 {
-    ///this->team. להשלים כמו בדף שצילמתי
-   ///+this->games_played;
+    return this->games_played;
 }
 void Player::addTo_GamesPlayed(int games)
 {
@@ -88,4 +87,8 @@ int Player::comparePlayerGoalsCardsId(const std::shared_ptr<Player> &a, const st
         return -1;
     }
     return -1;
+}
+
+void Player::setGamesPlayed(int games) {
+    this->games_played = games;
 }

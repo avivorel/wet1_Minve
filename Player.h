@@ -21,6 +21,7 @@ public:
     int getId() const;
     int getTeamId() const;
     int getGamesPlayed() const;
+    void setGamesPlayed(int games);
     int getGoals() const;
     int getCards() const;
     void addTo_GamesPlayed(int games);

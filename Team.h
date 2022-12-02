@@ -41,6 +41,7 @@ public:
     bool removePlayer(std::shared_ptr<Player> toRemove);
     static int compareTeamId(const std::shared_ptr<Team> &a, const std::shared_ptr<Team> &b);
     int getTopScorer() const;
+    void PlayersToArray(int number, std::shared_ptr<Player> *playersArray);
 
 };
 
