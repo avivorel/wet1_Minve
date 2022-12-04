@@ -216,7 +216,7 @@ output_t<int> world_cup_t::get_num_played_games(int playerId)
         return StatusType::FAILURE;
     }
     else{
-        return foundplayer->GetValue()->getGamesPlayed();
+        return foundplayer->GetValue()->getGamesPlayed() + foundplayer->GetValue()->getTeam()->getGamesPlayed();
     }
 }
 
@@ -255,16 +255,20 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     if (newTeam == nullptr){
         return StatusType::ALLOCATION_ERROR;
     }
-    std::shared_ptr<Player> allPlayers[foundTeam1->GetValue()->getNumOfPlayers()+foundTeam2->GetValue()->getNumOfPlayers()] ;
     std::shared_ptr<Player> team1_players_by_id[foundTeam1->GetValue()->getNumOfPlayers()];
-    std::shared_ptr<Player> team1_players_by_goals[foundTeam1->GetValue()->getNumOfPlayers()];
     std::shared_ptr<Player> team2_players_by_id[foundTeam2->GetValue()->getNumOfPlayers()];
-    std::shared_ptr<Player> team2_players_by_goals[foundTeam2->GetValue()->getNumOfPlayers()];
     foundTeam1->GetValue()->PlayersToArray(0,team1_players_by_id);
-    foundTeam1->GetValue()->PlayersToArray(1,team1_players_by_goals);
+    for (int i = 0; i <foundTeam1->GetValue()->getNumOfPlayers();i++ ){
+        team1_players_by_id[i]->setTeam(newTeam);
+        newTeam->add_player(team1_players_by_id[i]);
+    }
     foundTeam2->GetValue()->PlayersToArray(0,team2_players_by_id);
-    foundTeam2->GetValue()->PlayersToArray(1,team2_players_by_goals);
-
+    for (int i = 0; i <foundTeam2->GetValue()->getNumOfPlayers();i++ ){
+        team2_players_by_id[i]->setTeam(newTeam);
+        newTeam->add_player(team2_players_by_id[i]);
+    }
+    newTeam->setPoints(foundTeam1->GetValue()->getPoints(),foundTeam2->GetValue()->getPoints());
+    // לבדוק מחיקות
 }
 
 output_t<int> world_cup_t::get_top_scorer(int teamId)

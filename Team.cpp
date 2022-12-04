@@ -115,3 +115,7 @@ void Team::PlayersToArray(int number, std::shared_ptr<Player> *playersArray) {
         this->players_by_goals->ToArray(playersArray);
     }
 }
+
+int Team::setPoints(int team1Points, int team2Points) {
+    this->points = team1Points + team2Points;
+}
