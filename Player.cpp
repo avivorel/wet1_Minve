@@ -8,7 +8,7 @@
 
 Player::Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper) :
         player_id(playerId), team_id(teamId), games_played(gamesplayed),goals(goals), cards(cards), isGoalie(isGoalKeeper),
-        team(nullptr) {};
+        team(nullptr), closest_prev(nullptr),closest_next(nullptr) {};
 
 int Player::getId() const {
     return this->player_id;
@@ -92,4 +92,17 @@ int Player::comparePlayerGoalsCardsId(const std::shared_ptr<Player> &a, const st
 
 void Player::setGamesPlayed(int games) {
     this->games_played = games;
+}
+
+void Player::setNext(std::shared_ptr<Player> next) {
+    this->closest_next = std::move(next);
+}
+void Player::setPrev(std::shared_ptr<Player> prev) {
+    this->closest_prev = std::move(prev);
+}
+std::shared_ptr<Player> Player::getNext() {
+    return this->closest_next;
+}
+std::shared_ptr<Player> Player::getPrev() {
+    return this->closest_prev;
 }

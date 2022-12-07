@@ -16,7 +16,8 @@ class Player {
     int cards;
     bool isGoalie;
     std::shared_ptr<Team> team; ////todo need *???
-    std::shared_ptr<Player> closest; ////todo need *???
+    std::shared_ptr<Player> closest_prev;
+    std::shared_ptr<Player> closest_next;
 
 public:
     Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper);
@@ -30,6 +31,10 @@ public:
     void addTo_GamesPlayed(int games);
     void setGoals(int goals);
     void setCards(int cards);
+    void setNext(std::shared_ptr<Player> next);
+    void setPrev(std::shared_ptr<Player> prev);
+    std::shared_ptr<Player> getNext();
+    std::shared_ptr<Player> getPrev();
     bool isGK() const;
     static int comparePlayerId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b);
     static int comparePlayerGoalsCardsId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b);

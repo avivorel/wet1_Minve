@@ -120,9 +120,9 @@ public:
 
     void ToArray(T *array);
 
-    const AVLNode<T>  find_closest_next(AVLNode<T>* root, AVLNode<T>* node);
+    AVLNode<T>*  find_closest_next(AVLNode<T>* root, AVLNode<T>* node);
 
-    const AVLNode<T>  find_closest_prev(AVLNode<T>* root, AVLNode<T>* node);
+    AVLNode<T>*  find_closest_prev(AVLNode<T>* root, AVLNode<T>* node);
 };
 
 template<class T>
@@ -615,23 +615,23 @@ const AVLNode<T> *AVLTree<T>::GetMinNode() const {
 
 
 template<class T>
-const AVLNode<T>  AVLTree<T>::find_closest_next(AVLNode<T>* root, AVLNode<T>* node)
+AVLNode<T>* AVLTree<T>::find_closest_next(AVLNode<T>* root, AVLNode<T>* node)
 {
-    if (node->right != nullptr)
-        return FindMinValInTree(node->right);
+    if (node->GetRight() != nullptr)
+        return FindMinValInTree(node->GetRight());
 
     AVLNode<T>* next = nullptr;
 
     while (root != nullptr)
     {
-        if (compare(node->data ,root->data) == -1)
+        if (compare(node->GetValue() ,root->GetValue()) == -1)
         {
             next = root;
-            root = root->left;
+            root = root->GetLeft();
         }
 
-        else if (compare(node->data ,root->data) == 1)
-            root = root->right;
+        else if (compare(node->GetValue() ,root->GetValue()) == 1)
+            root = root->GetRight();
 
         else
             break;
@@ -640,28 +640,26 @@ const AVLNode<T>  AVLTree<T>::find_closest_next(AVLNode<T>* root, AVLNode<T>* no
 }
 
 template<class T>
-const AVLNode<T> AVLTree<T>:: find_closest_prev(AVLNode<T>* root, AVLNode<T>* node)
+AVLNode<T>* AVLTree<T>:: find_closest_prev(AVLNode<T>* root, AVLNode<T>* node)
 {
-    if (node->left != nullptr)
-        return FindMaxValInTree(node->left);
+    if (node->GetLeft() != nullptr)
+        return FindMaxValInTree(node->GetLeft());
 
     AVLNode<T>* prev = nullptr;
 
     while (root != nullptr)
     {
-        if (compare(node->data ,root->data) == -1)
+        if (compare(node->GetValue() ,root->GetValue()) == -1)
         {
-            root = root->left;
+            root = root->GetLeft();
         }
-
-            else if (compare(node->data ,root->data) == 1)
-            {
+        else if (compare(node->GetValue() ,root->GetValue()) == 1)
+        {
                 prev = root;
-                root = root->right;
-            }
-
-            else
-                break;
+                root = root->GetRight();
+        }
+        else
+            break;
     }
     return prev;
 }
