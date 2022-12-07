@@ -31,6 +31,7 @@ int Player::getTeamId() const
 int Player::getGamesPlayed() const
 {
     return this->games_played;
+
 }
 void Player::addTo_GamesPlayed(int games)
 {

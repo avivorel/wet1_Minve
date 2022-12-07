@@ -36,7 +36,6 @@ public:
     int setPoints(int team1Points, int team2Points);
     int getPoints() const;
     void addTo_points(int p);
-    Player* findPlayer(int playerid) const;
     bool isEmpty() const;
     bool add_player(std::shared_ptr<Player> playerToAdd); // true if succeeds
     bool removePlayer(std::shared_ptr<Player> toRemove);
@@ -44,6 +43,7 @@ public:
     int getTopScorer() const;
     void PlayersToArray(int number, std::shared_ptr<Player> *playersArray);
 
+    ///Player* findPlayer(int playerid) const;
 };
 
 

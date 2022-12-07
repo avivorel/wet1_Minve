@@ -120,6 +120,9 @@ public:
 
     void ToArray(T *array);
 
+    const AVLNode<T>  find_closest_next(AVLNode<T>* root, AVLNode<T>* node);
+
+    const AVLNode<T>  find_closest_prev(AVLNode<T>* root, AVLNode<T>* node);
 };
 
 template<class T>
@@ -611,7 +614,57 @@ const AVLNode<T> *AVLTree<T>::GetMinNode() const {
 }
 
 
+template<class T>
+const AVLNode<T>  AVLTree<T>::find_closest_next(AVLNode<T>* root, AVLNode<T>* node)
+{
+    if (node->right != nullptr)
+        return FindMinValInTree(node->right);
 
+    AVLNode<T>* next = nullptr;
+
+    while (root != nullptr)
+    {
+        if (compare(node->data ,root->data) == -1)
+        {
+            next = root;
+            root = root->left;
+        }
+
+        else if (compare(node->data ,root->data) == 1)
+            root = root->right;
+
+        else
+            break;
+    }
+    return next;
+}
+
+template<class T>
+const AVLNode<T> AVLTree<T>:: find_closest_prev(AVLNode<T>* root, AVLNode<T>* node)
+{
+    if (node->left != nullptr)
+        return FindMaxValInTree(node->left);
+
+    AVLNode<T>* prev = nullptr;
+
+    while (root != nullptr)
+    {
+        if (compare(node->data ,root->data) == -1)
+        {
+            root = root->left;
+        }
+
+            else if (compare(node->data ,root->data) == 1)
+            {
+                prev = root;
+                root = root->right;
+            }
+
+            else
+                break;
+    }
+    return prev;
+}
 
 #endif //MAIN_CPP_AVLTTREE_H
 

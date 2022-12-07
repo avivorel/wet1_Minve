@@ -7,6 +7,7 @@
 #include <memory>
 class Team;
 
+
 class Player {
     int player_id;
     int team_id;
@@ -14,7 +15,9 @@ class Player {
     int goals;
     int cards;
     bool isGoalie;
-    std::shared_ptr<Team>  team; //// need *???
+    std::shared_ptr<Team> team; ////todo need *???
+    std::shared_ptr<Player> closest; ////todo need *???
+
 public:
     Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper);
     // להוסיף הורס

@@ -18,14 +18,17 @@ world_cup_t::~world_cup_t()
 
 StatusType world_cup_t::add_team(int teamId, int points)
 {
-    if(teamId < 0 or points< 0){
+    if(teamId < 0 or points< 0)
+    {
         return StatusType::INVALID_INPUT;
     }
     std::shared_ptr<Team> newTeam(new Team(teamId,points));
-    if (newTeam == nullptr){
+    if (newTeam == nullptr)
+    {
         return StatusType::ALLOCATION_ERROR;
     }
-    if(!this->all_teams->Insert(newTeam)){
+    if(!this->all_teams->Insert(newTeam))
+    {
         return StatusType::FAILURE;
     }
     return StatusType::SUCCESS;
@@ -185,15 +188,15 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
         team1->GetValue()->addTo_points(3);
     }
     else
-        if (eq_team1 == eq_team2)
-        {
-            team1->GetValue()->addTo_points(1);
-            team2->GetValue()->addTo_points(1);
+    if (eq_team1 == eq_team2)
+    {
+        team1->GetValue()->addTo_points(1);
+        team2->GetValue()->addTo_points(1);
 
-        } else
-        {
-            team2->GetValue()->addTo_points(3);
-        }
+    } else
+    {
+        team2->GetValue()->addTo_points(3);
+    }
 
     team1->GetValue()->addTo_GamesPlayed(1);
     team2->GetValue()->addTo_GamesPlayed(1);
@@ -358,8 +361,9 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 
 output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 {
-    // TODO: Your code goes here
-    return 1006;
+    std::shared_ptr<Team> team(new Team(teamId,0));
+    auto *foundTeam =
+
 }
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
