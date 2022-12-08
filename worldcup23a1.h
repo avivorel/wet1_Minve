@@ -28,6 +28,7 @@ private:
     AVLTree<std::shared_ptr<Player>> *all_players;
     AVLTree<std::shared_ptr<Player>> *all_players_by_goals;
     AVLTree<std::shared_ptr<Team>> *all_teams;
+    AVLTree<std::shared_ptr<Team>> *all_viable_teams;
     std::shared_ptr<Player> topScorer;
     int numberOfPlayers;
 

@@ -2,7 +2,7 @@
 #define MAIN_CPP_AVLTTREE_H
 //TODO DELETE
 #include <iostream>
-//#include <cassert>
+#include "LinkedList.h"
 
 template<class T>
 class AVLNode {
@@ -121,6 +121,8 @@ public:
     void ToArray(T *array);
 
     AVLNode<T>*  find_closest_next(AVLNode<T>* root, AVLNode<T>* node);
+
+    void inorder_search_ll(LinkedList<T> teams, int minval, int maxval);
 
     AVLNode<T>*  find_closest_prev(AVLNode<T>* root, AVLNode<T>* node);
 };
@@ -663,7 +665,20 @@ AVLNode<T>* AVLTree<T>:: find_closest_prev(AVLNode<T>* root, AVLNode<T>* node)
     }
     return prev;
 }
+template<class T>
+void AVLTree<T>::inorder_search_ll(LinkedList<T> list, int minval, int maxval){
+    if (root == nullptr) return;
+
+    if (root->GetValue() > minval)
+        inorder_search(root->GetLeft(), minval, maxval);
+
+    if (root->GetValue() >= minval && root->GetValue() <= maxval){
+        list.insert(root->GetValue());
+    }
+
+    if (root->GetValue() < maxval)
+        inorder_search(root->GetRight(), minval, maxval);
+}
+
 
 #endif //MAIN_CPP_AVLTTREE_H
-
-

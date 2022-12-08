@@ -1,11 +1,13 @@
 #include "worldcup23a1.h"
 #include <memory>
 
+
 world_cup_t::world_cup_t()
 {
     all_players = new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId);
     all_teams = new AVLTree<std::shared_ptr<Team>>(Team::compareTeamId);
     all_players_by_goals = new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerGoalsCardsId);
+    all_viable_teams =  new AVLTree<std::shared_ptr<Team>>(Team::compareTeamId);
     topScorer = nullptr;
     numberOfPlayers = 0;
 }
@@ -75,12 +77,14 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
     if (foundteam == nullptr){
         return StatusType::FAILURE;
     }
-
     player->setTeam(foundteam->GetValue());
     if (foundteam->GetValue()->add_player(player))
     {
         all_players->Insert(player);
         all_players_by_goals->Insert(player);
+        if (foundteam->GetValue()->getNumOfPlayers() >= 11 && foundteam->GetValue()->hasGk()){
+            this->all_viable_teams->Insert(foundteam->GetValue());
+        }
         AVLNode<std::shared_ptr<Player>> *PlayerNode = all_players_by_goals->Find(player);
         AVLNode<std::shared_ptr<Player>> *next = all_players_by_goals->find_closest_next(all_players_by_goals->GetRoot(),PlayerNode);
         AVLNode<std::shared_ptr<Player>> *prev = all_players_by_goals->find_closest_prev(all_players_by_goals->GetRoot(),PlayerNode);
@@ -111,21 +115,24 @@ StatusType world_cup_t::remove_player(int playerId)
         return StatusType::INVALID_INPUT;
     }
     std::shared_ptr<Player> toRemove(new Player(playerId,0,0,0,0,0));
-
     if (toRemove == nullptr) /// delete?
         return StatusType::ALLOCATION_ERROR;
-
     auto *foundPlayer = this->all_players->Find(toRemove);
     if (foundPlayer == nullptr)
     {
         return StatusType::FAILURE;
     }
+
     std::shared_ptr<Team> team = foundPlayer->GetValue()->getTeam();
     team->addTo_PM_Equation(-foundPlayer->GetValue()->getGoals()+foundPlayer->GetValue()->getCards());
+    all_players->Remove(foundPlayer->GetValue());
+    all_players_by_goals->Remove(foundPlayer->GetValue());
+
     if (topScorer == foundPlayer->GetValue()){
         topScorer = foundPlayer->GetValue()->getPrev();
         foundPlayer->GetValue()->getPrev()->setNext(nullptr);
     }
+
     else{
         if (foundPlayer->GetValue()->getPrev() != nullptr){
             foundPlayer->GetValue()->getPrev()->setNext(foundPlayer->GetValue()->getNext());
@@ -135,10 +142,13 @@ StatusType world_cup_t::remove_player(int playerId)
             foundPlayer->GetValue()->getNext()->setPrev(nullptr);
         }
     }
+
     (team)->removePlayer(foundPlayer->GetValue());
-    all_players->Remove(foundPlayer->GetValue());
-    all_players_by_goals->Remove(foundPlayer->GetValue());
     foundPlayer->GetValue()->setTeam(nullptr);
+
+    if (team->getNumOfPlayers() < 11 or !team->hasGk()){
+        all_viable_teams->Remove(team);
+    }
     numberOfPlayers -= 1;
     return StatusType::SUCCESS;
 }
@@ -380,27 +390,54 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 {
     if (playerId <= 0 || teamId <= 0){
-        return StatusType::INVALID_INPUT;
+        return {StatusType::INVALID_INPUT};
     }
     std::shared_ptr<Team> team(new Team(teamId,0));
     if (team == nullptr){
-        return StatusType::ALLOCATION_ERROR;
+        return {StatusType::ALLOCATION_ERROR};
     }
     auto *foundTeam = this->all_teams->Find(team);
     if (team == nullptr){
-        return StatusType::FAILURE;
+        return {StatusType::FAILURE};
     }
     std::shared_ptr<Player> foundPlayer = foundTeam->GetValue()->findPlayer(playerId);
     if (foundPlayer == nullptr || numberOfPlayers == 1){
-        return StatusType::FAILURE;
+        return {StatusType::FAILURE};
     }
-    // if next is null then edit topscorer
-    // if prev is null then nothing
+    if (foundPlayer->getPrev() != nullptr && foundPlayer->getNext() != nullptr){
+       if (foundPlayer->getGoals()-foundPlayer->getPrev()->getGoals() == foundPlayer->getNext()->getGoals()-foundPlayer->getGoals()){
+           if (abs(foundPlayer->getPrev()->getCards() - foundPlayer->getCards()) > abs(foundPlayer->getNext()->getCards() - foundPlayer->getCards())){
+               return {foundPlayer->getNext()->getId()};
+           }
+           else if (abs(foundPlayer->getPrev()->getCards() - foundPlayer->getCards()) < abs(foundPlayer->getNext()->getCards() - foundPlayer->getCards())){
+               return {foundPlayer->getPrev()->getId()};
+           }
+           else{
+                if (abs(foundPlayer->getPrev()->getId() - foundPlayer->getId()) > abs(foundPlayer->getNext()->getId() - foundPlayer->getId())){
+                    return {foundPlayer->getNext()->getId()};
+                }
+                else if (abs(foundPlayer->getPrev()->getId() - foundPlayer->getId()) < abs(foundPlayer->getNext()->getId() - foundPlayer->getId())){
+                    return {foundPlayer->getPrev()->getId()};
+                }
+                else{
+                    return {std::max(foundPlayer->getPrev()->getId(),foundPlayer->getNext()->getId())};
+                }
+           }
+       }
+       else{
+           return (foundPlayer->getGoals()-foundPlayer->getPrev()->getGoals() < foundPlayer->getNext()->getGoals()-foundPlayer->getGoals()) ?
+           output_t<int>(foundPlayer->getPrev()->getId()) : output_t<int>(foundPlayer->getNext()->getId());
+       }
+    }
 
 }
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
-    // TODO: Your code goes here
-    return 2;
+    auto inorder_search_ll = [](LinkedList<Team> list, int minval, int maxval){
+    };
+    if (minTeamId< 0 || maxTeamId< 0 || maxTeamId< minTeamId){
+        return {StatusType::INVALID_INPUT};
+    }
+    auto *list = new LinkedList<Team>();
 }
