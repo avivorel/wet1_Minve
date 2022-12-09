@@ -33,7 +33,6 @@ StatusType world_cup_t::add_team(int teamId, int points)
         {
             return StatusType::ALLOCATION_ERROR;
         }
-
         if(!this->all_teams->Insert(newTeam))
         {
             return StatusType::FAILURE;
@@ -341,7 +340,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
             newTeam->add_player(team2_players_by_id[i]);
         }
         newTeam->setPoints(foundTeam1->GetValue()->getPoints(), foundTeam2->GetValue()->getPoints());
-        // לבדוק מחיקות
+        // need to refine ASAP
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 }
 
@@ -497,5 +496,54 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
     }
     auto *list = new LinkedList<std::shared_ptr<Team>>();
     this->all_viable_teams->inorder_search_ll(this->all_viable_teams->GetRoot(),list,team_min,team_max);
+    while (list->getHead() != nullptr && list->getHead()->next != nullptr){
+        Node<std::shared_ptr<Team>> *first_team = list->getHead();
+        Node<std::shared_ptr<Team>> *second_team = list->getHead()->next;
+        while (first_team != nullptr && second_team!= nullptr){
+            int eq_team1 = first_team->data->getPoints() + first_team->data->get_PM_Equation();
+            int eq_team2 = second_team->data->getPoints() + second_team->data->get_PM_Equation();
+            if (eq_team1 > eq_team2){
+                first_team->data->addTo_points(3);
+                unite_teams(first_team->data->getId(),second_team->data->getId(),first_team->data->getId());
+                std::shared_ptr<Team> newTeam(new Team(first_team->data->getId(),0));
+                first_team->setData((this->all_teams->Find(newTeam)->GetValue()));
+                list->remove(second_team);
+                first_team = second_team->next;
+                second_team = first_team->next;
+            }
+            else if (eq_team1 < eq_team2){
+                second_team->data->addTo_points(3);
+                unite_teams(first_team->data->getId(),second_team->data->getId(),second_team->data->getId());
+                std::shared_ptr<Team> newTeam(new Team(second_team->data->getId(),0));
+                first_team->setData((this->all_teams->Find(newTeam)->GetValue()));
+                list->remove(first_team);
+                first_team = second_team->next;
+                second_team = first_team->next;
+            }
+            else{
+                if(first_team->data->getId()> second_team->data->getId()){
+                    first_team->data->addTo_points(3);
+                    unite_teams(first_team->data->getId(),second_team->data->getId(),first_team->data->getId());
+                    std::shared_ptr<Team> newTeam(new Team(first_team->data->getId(),0));
+                    first_team->setData((this->all_teams->Find(newTeam)->GetValue()));
+                    list->remove(second_team);
+                    first_team = second_team->next;
+                    second_team = first_team->next;
+                }
+                else{
+                    second_team->data->addTo_points(3);
+                    unite_teams(first_team->data->getId(),second_team->data->getId(),second_team->data->getId());
+                    std::shared_ptr<Team> newTeam(new Team(second_team->data->getId(),0));
+                    first_team->setData((this->all_teams->Find(newTeam)->GetValue()));
+                    list->remove(first_team);
+                    first_team = second_team->next;
+                    second_team = first_team->next;
+                }
+            }
+        }
+    }
+    int winning_team_id = list->getHead()->data->getId();
+    list->deleteList();
+    return {winning_team_id};
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 }

@@ -15,6 +15,9 @@ public:
         next = NULL;
         prev = NULL;
     }
+    void setData(T newdata){
+        data = newdata;
+    }
 };
 
 template<typename T>
@@ -39,13 +42,37 @@ public:
             tail = newNode;
         }
     }
+    Node<T>* getHead(){
+        return this->head;
+    }
+    void remove(Node<T> *node) {
+        // if the node to be removed is the head
+        if (node == head) {
+            head = node->next;
+        } else {
+            node->prev->next = node->next;
+        }
+
+        // if the node to be removed is the tail
+        if (node == tail) {
+            tail = node->prev;
+        } else {
+            node->next->prev = node->prev;
+        }
+
+        delete node;
+    }
+    void deleteList() {
+        Node<T> *current = head;
+        while (current != NULL) {
+            Node<T> *next = current->next;
+            delete current;
+            current = next;
+        }
+
+        head = NULL;
+        tail = NULL;
+    }
 };
-    //void printList(){
-    //    Node<T>* temp = head;
-    //    while(temp != NULL){
-    //        cout << temp->data << " ";
-    //        temp = temp->next;
-    //    }
-     //   cout << endl;
-    //}
+
 #endif //SOLUTION_LINKEDLIST_H
