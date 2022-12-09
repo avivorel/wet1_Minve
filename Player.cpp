@@ -35,7 +35,7 @@ int Player::getGamesPlayed() const
 }
 void Player::addTo_GamesPlayed(int games)
 {
-    this->games_played=+games;
+    this->games_played= this->games_played + games;
 }
 
 int Player::getGoals() const
@@ -95,9 +95,15 @@ void Player::setGamesPlayed(int games) {
 }
 
 void Player::setNext(std::shared_ptr<Player> next) {
+    if (next == nullptr || next == NULL){
+        this->closest_prev = nullptr;
+    }
     this->closest_next = std::move(next);
 }
 void Player::setPrev(std::shared_ptr<Player> prev) {
+    if (prev == nullptr || prev == NULL){
+        this->closest_prev = nullptr;
+    }
     this->closest_prev = std::move(prev);
 }
 std::shared_ptr<Player> Player::getNext() {

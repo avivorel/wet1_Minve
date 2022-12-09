@@ -120,7 +120,7 @@ void Team::PlayersToArray(int number, std::shared_ptr<Player> *playersArray) {
 }
 
 int Team::setPoints(int team1Points, int team2Points) {
-    this->points = team1Points + team2Points;
+    this->points = this->points+ team1Points + team2Points;
 }
 
 std::shared_ptr<Player> Team::findPlayer(int playerid) const {

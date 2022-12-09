@@ -70,7 +70,6 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,int
     {
         return StatusType::INVALID_INPUT;
     }
-
     try
     {
         std::shared_ptr<Player> player(new Player(playerId, teamId, gamesPlayed, goals, cards, goalKeeper));
@@ -101,20 +100,20 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,int
         {
             all_players->Insert(player);
             all_players_by_goals->Insert(player);
-
             if (foundteam->GetValue()->getNumOfPlayers() >= 11 && foundteam->GetValue()->hasGk())
             {
                 this->all_viable_teams->Insert(foundteam->GetValue());
             }
-
             AVLNode<std::shared_ptr<Player>> *PlayerNode = all_players_by_goals->Find(player);
             AVLNode<std::shared_ptr<Player>> *next = all_players_by_goals->find_closest_next(all_players_by_goals->GetRoot(),PlayerNode);
             AVLNode<std::shared_ptr<Player>> *prev = all_players_by_goals->find_closest_prev
                 (all_players_by_goals->GetRoot(),PlayerNode);
-
-            PlayerNode->GetValue()->setPrev(prev->GetValue());
-
-            PlayerNode->GetValue()->setNext(next->GetValue());
+            if (prev != nullptr){
+                PlayerNode->GetValue()->setPrev(prev->GetValue());
+            }
+            if (next != nullptr) {
+                PlayerNode->GetValue()->setNext(next->GetValue());
+            }
             if (topScorer == nullptr)
             {
                 topScorer = player;
@@ -146,31 +145,27 @@ StatusType world_cup_t::remove_player(int playerId)
         if (toRemove == nullptr) /// delete?
             return StatusType::ALLOCATION_ERROR;
 
-        auto *foundPlayer = this->all_players->Find(toRemove);
-
-        if (foundPlayer == nullptr) {
+        auto *foundPlayer_all = this->all_players->Find(toRemove);
+        auto *foundPlayer_goals = this->all_players_by_goals->Find(toRemove);
+        if (foundPlayer_all == nullptr) {
             return StatusType::FAILURE;
         }
-
-        std::shared_ptr<Team> team = foundPlayer->GetValue()->getTeam();
-        team->addTo_PM_Equation(-foundPlayer->GetValue()->getGoals() + foundPlayer->GetValue()->getCards());
-        all_players->Remove(foundPlayer->GetValue());
-        all_players_by_goals->Remove(foundPlayer->GetValue());
-
-        if (topScorer == foundPlayer->GetValue()) {
-            topScorer = foundPlayer->GetValue()->getPrev();
-            foundPlayer->GetValue()->getPrev()->setNext(nullptr);
+        if (topScorer == foundPlayer_all->GetValue()) {
+            topScorer = foundPlayer_all->GetValue()->getPrev();
+            foundPlayer_all->GetValue()->getPrev()->setNext(nullptr);
         } else {
-            if (foundPlayer->GetValue()->getPrev() != nullptr) {
-                foundPlayer->GetValue()->getPrev()->setNext(foundPlayer->GetValue()->getNext());
-                foundPlayer->GetValue()->getNext()->setPrev(foundPlayer->GetValue()->getPrev());
-            } else { foundPlayer->GetValue()->getNext()->setPrev(nullptr); }
+            if (foundPlayer_all->GetValue()->getPrev() != nullptr) {
+                foundPlayer_all->GetValue()->getPrev()->setNext(foundPlayer_all->GetValue()->getNext());
+                foundPlayer_all->GetValue()->getNext()->setPrev(foundPlayer_all->GetValue()->getPrev());
+            } else { foundPlayer_all->GetValue()->getNext()->setPrev(nullptr); }
 
         }
-
-        (team)->removePlayer(foundPlayer->GetValue());
-        foundPlayer->GetValue()->setTeam(nullptr);
-
+        std::shared_ptr<Team> team = foundPlayer_all->GetValue()->getTeam();
+        team->addTo_PM_Equation(-foundPlayer_all->GetValue()->getGoals() + foundPlayer_all->GetValue()->getCards());
+        (team)->removePlayer(foundPlayer_all->GetValue());
+        all_players->Remove(foundPlayer_all->GetValue());
+        all_players_by_goals->Remove(foundPlayer_goals->GetValue());
+        //foundPlayer_all->GetValue()->setTeam(nullptr);
         if (team->getNumOfPlayers() < 11 or !team->hasGk()) {
             all_viable_teams->Remove(team);
         }
@@ -205,19 +200,25 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,int sc
         std::shared_ptr<Player> newPlayer(
                 new Player(player->getId(), player->getTeam()->getId(), player->getGamesPlayed() + gamesPlayed,
                            player->getGoals() + scoredGoals, player->getCards() + cardsReceived, player->isGK()));
-
+        int team_id = player->getTeam()->getId();
         remove_player(playerId);
 
-        add_player(newPlayer->getId(), newPlayer->getTeam()->getId(), newPlayer->getGamesPlayed(),
+        add_player(newPlayer->getId(), team_id, newPlayer->getGamesPlayed(),
                    newPlayer->getGoals(),
                    newPlayer->getCards(), newPlayer->isGK());
         if (next != nullptr) {
-            next->setPrev((all_players_by_goals->find_closest_prev(all_players_by_goals->GetRoot(),
-                                                                   all_players_by_goals->Find(next)))->GetValue());
+            AVLNode<std::shared_ptr<Player>> *new_prev = all_players_by_goals->find_closest_prev(all_players_by_goals->GetRoot(),
+            all_players_by_goals->Find(next));
+            if (new_prev != nullptr) {
+                next->setPrev(new_prev->GetValue());
+            }
         }
         if (prev != nullptr) {
-            prev->setNext((all_players_by_goals->find_closest_next(all_players_by_goals->GetRoot(),
-                                                                   all_players_by_goals->Find(prev)))->GetValue());
+            AVLNode<std::shared_ptr<Player>> *new_next = all_players_by_goals->find_closest_next(all_players_by_goals->GetRoot(),
+            all_players_by_goals->Find(prev));
+            if(new_next != nullptr){
+                prev->setNext(new_next->GetValue());
+            }
         }
 
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
@@ -309,10 +310,10 @@ output_t<int> world_cup_t::get_team_points(int teamId)
 
 StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 {
+    try {
     if (teamId1 <= 0 or teamId2 <= 0 or newTeamId <= 0 or teamId2 == teamId1){
         return StatusType::INVALID_INPUT;
-    }
-    try {
+        }
         std::shared_ptr<Team> team1(new Team(teamId1, 0));
         std::shared_ptr<Team> team2(new Team(teamId2, 0));
         if (team1 == nullptr or team2 == nullptr) {
@@ -320,7 +321,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         }
         auto *foundTeam1 = this->all_teams->Find(team1);
         auto *foundTeam2 = this->all_teams->Find(team2);
-        if (foundTeam1 == nullptr or foundTeam2 == nullptr) {
+        if (foundTeam1 == nullptr || foundTeam2 == nullptr) {
             return StatusType::FAILURE;
         }
         std::shared_ptr<Team> newTeam(new Team(newTeamId, 0));
@@ -340,7 +341,14 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
             newTeam->add_player(team2_players_by_id[i]);
         }
         newTeam->setPoints(foundTeam1->GetValue()->getPoints(), foundTeam2->GetValue()->getPoints());
-        // need to refine ASAP
+        //this->all_teams->Insert(newTeam);
+        //if (newTeam->getNumOfPlayers() >= 11 && newTeam->hasGk()){
+        //    all_viable_teams->Insert(newTeam);
+        //}
+       // this->all_teams->Remove(foundTeam1->GetValue());
+        //this->all_viable_teams->Remove(foundTeam1->GetValue());
+        //this->all_teams->Remove(foundTeam2->GetValue());
+        //this->all_viable_teams->Remove(foundTeam2->GetValue());
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 }
 
@@ -415,7 +423,8 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output) {
                     std::shared_ptr<Player> players[numbOfPlayers];
                     foundTeam->GetValue()->PlayersToArray(1, players);
                     for (int i = 0; i < numbOfPlayers; i++) {
-                        output[i] = players[numbOfPlayers - i - 1]->getId();
+                        //output[i] = players[numbOfPlayers - i - 1]->getId();
+                        output[i] = players[i]->getId();
                     }
                 }
             }
@@ -483,6 +492,14 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
                        output_t<int>(foundPlayer->getPrev()->getId()) : output_t<int>(foundPlayer->getNext()->getId());
             }
         }
+        else{
+            if (foundPlayer->getPrev() != nullptr){
+                return output_t<int>(foundPlayer->getPrev()->getId());
+            }
+            else{
+                return output_t<int>(foundPlayer->getNext()->getId());
+            }
+        }
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 }
 
@@ -505,39 +522,47 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
             if (eq_team1 > eq_team2){
                 first_team->data->addTo_points(3);
                 unite_teams(first_team->data->getId(),second_team->data->getId(),first_team->data->getId());
-                std::shared_ptr<Team> newTeam(new Team(first_team->data->getId(),0));
+                std::shared_ptr<Team> newTeam(new Team(first_team->data->getId(),first_team->data->getPoints()+second_team->data->getPoints()));
                 first_team->setData((this->all_teams->Find(newTeam)->GetValue()));
                 list->remove(second_team);
                 first_team = second_team->next;
-                second_team = first_team->next;
+                if (first_team != nullptr){
+                    second_team = first_team->next;
+                }
             }
             else if (eq_team1 < eq_team2){
                 second_team->data->addTo_points(3);
                 unite_teams(first_team->data->getId(),second_team->data->getId(),second_team->data->getId());
-                std::shared_ptr<Team> newTeam(new Team(second_team->data->getId(),0));
-                first_team->setData((this->all_teams->Find(newTeam)->GetValue()));
+                std::shared_ptr<Team> newTeam(new Team(second_team->data->getId(),first_team->data->getPoints()+second_team->data->getPoints()));
+                second_team->setData((this->all_teams->Find(newTeam)->GetValue()));
                 list->remove(first_team);
                 first_team = second_team->next;
-                second_team = first_team->next;
+                if (first_team != nullptr){
+                    second_team = first_team->next;
+                }
             }
             else{
-                if(first_team->data->getId()> second_team->data->getId()){
+                if(first_team->data->getId() > second_team->data->getId()){
                     first_team->data->addTo_points(3);
                     unite_teams(first_team->data->getId(),second_team->data->getId(),first_team->data->getId());
-                    std::shared_ptr<Team> newTeam(new Team(first_team->data->getId(),0));
+                    std::shared_ptr<Team> newTeam(new Team(first_team->data->getId(),first_team->data->getPoints()+second_team->data->getPoints()));
                     first_team->setData((this->all_teams->Find(newTeam)->GetValue()));
                     list->remove(second_team);
                     first_team = second_team->next;
-                    second_team = first_team->next;
+                    if (first_team != nullptr){
+                        second_team = first_team->next;
+                    }
                 }
                 else{
                     second_team->data->addTo_points(3);
                     unite_teams(first_team->data->getId(),second_team->data->getId(),second_team->data->getId());
-                    std::shared_ptr<Team> newTeam(new Team(second_team->data->getId(),0));
+                    std::shared_ptr<Team> newTeam(new Team(second_team->data->getId(),first_team->data->getPoints()+second_team->data->getPoints()));
                     first_team->setData((this->all_teams->Find(newTeam)->GetValue()));
                     list->remove(first_team);
                     first_team = second_team->next;
-                    second_team = first_team->next;
+                    if (first_team != nullptr){
+                        second_team = first_team->next;
+                    }
                 }
             }
         }
