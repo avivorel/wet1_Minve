@@ -434,10 +434,11 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
-    auto inorder_search_ll = [](LinkedList<Team> list, int minval, int maxval){
-    };
+    std::shared_ptr<Team> team_min(new Team(minTeamId,0));
+    std::shared_ptr<Team> team_max(new Team(maxTeamId,0));
     if (minTeamId< 0 || maxTeamId< 0 || maxTeamId< minTeamId){
         return {StatusType::INVALID_INPUT};
     }
-    auto *list = new LinkedList<Team>();
+    auto *list = new LinkedList<std::shared_ptr<Team>>();
+    this->all_viable_teams->inorder_search_ll(this->all_viable_teams->GetRoot(),list,team_min,team_max);
 }

@@ -122,7 +122,7 @@ public:
 
     AVLNode<T>*  find_closest_next(AVLNode<T>* root, AVLNode<T>* node);
 
-    void inorder_search_ll(LinkedList<T> teams, int minval, int maxval);
+    void inorder_search_ll(AVLNode<T>* root, LinkedList<T> *list, T minval, T maxval);
 
     AVLNode<T>*  find_closest_prev(AVLNode<T>* root, AVLNode<T>* node);
 };
@@ -666,18 +666,18 @@ AVLNode<T>* AVLTree<T>:: find_closest_prev(AVLNode<T>* root, AVLNode<T>* node)
     return prev;
 }
 template<class T>
-void AVLTree<T>::inorder_search_ll(LinkedList<T> list, int minval, int maxval){
+void AVLTree<T>::inorder_search_ll(AVLNode<T>* root,LinkedList<T> *list, T minval, T maxval){
     if (root == nullptr) return;
 
-    if (root->GetValue() > minval)
-        inorder_search(root->GetLeft(), minval, maxval);
+    if (compare(root->GetValue(),minval) == 1)
+        inorder_search_ll(root->GetLeft(),list, minval, maxval);
 
-    if (root->GetValue() >= minval && root->GetValue() <= maxval){
-        list.insert(root->GetValue());
+    if (compare(root->GetValue(),minval) != -1 && compare(root->GetValue(),maxval) != 1){
+        list->insert(root->GetValue());
     }
 
-    if (root->GetValue() < maxval)
-        inorder_search(root->GetRight(), minval, maxval);
+    if (compare(root->GetValue(),maxval) == -1)
+        inorder_search_ll(root->GetRight(),list, minval, maxval);
 }
 
 
