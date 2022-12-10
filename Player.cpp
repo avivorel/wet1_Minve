@@ -4,6 +4,9 @@
 
 #include "Player.h"
 #include <memory>
+#include <utility>
+
+class Team{};
 
 
 Player::Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper) :
@@ -16,7 +19,7 @@ int Player::getId() const {
 
 void Player::setTeam(std::shared_ptr<Team> newteam)
 {
-    this->team = newteam; //??
+    this->team = std::move(newteam); //??
 }
 
 std::shared_ptr<Team> Player::getTeam() {

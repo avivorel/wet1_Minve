@@ -58,6 +58,9 @@ bool Team::isEmpty() const
 
 bool Team::add_player(std::shared_ptr<Player> playerToAdd)
 {
+    //if (playerToAdd->getTeam() != nullptr){
+       // playerToAdd->getTeam()->removePlayer(playerToAdd);
+ //   }
     if (this->players->Insert(playerToAdd) and this->players_by_goals->Insert(playerToAdd)) {
         playerToAdd->setGamesPlayed(playerToAdd->getGamesPlayed()-this->games_played);
         if (topScorer == nullptr){

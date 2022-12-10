@@ -50,13 +50,15 @@ StatusType world_cup_t::remove_team(int teamId)
 
     try {
         std::shared_ptr<Team> toRemove(new Team(teamId, 0));
-        auto *teamToRemove = this->all_teams->Find(toRemove);
-
-        if (teamToRemove == nullptr or !(teamToRemove->GetValue()->isEmpty()))
+        auto *all_teams_remove = this->all_teams->Find(toRemove);
+        auto *viable_teams_remove = this->all_viable_teams->Find(toRemove);
+        if ((all_teams_remove == nullptr || !(all_teams_remove->GetValue()->isEmpty())) || (viable_teams_remove ==
+                nullptr || !viable_teams_remove->GetValue()->isEmpty()))
         {
             return StatusType::FAILURE;
         }
-        this->all_teams->Remove(teamToRemove->GetValue());
+        this->all_teams->Remove(all_teams_remove->GetValue());
+        this->all_viable_teams->Remove(viable_teams_remove->GetValue());
     }  catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 
 }
@@ -320,11 +322,13 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
             return StatusType::ALLOCATION_ERROR;
         }
         auto *foundTeam1 = this->all_teams->Find(team1);
+        auto *foundTeam1_viable = this->all_viable_teams->Find(team1);
         auto *foundTeam2 = this->all_teams->Find(team2);
+        auto *foundTeam2_viable = this->all_viable_teams->Find(team2);
         if (foundTeam1 == nullptr || foundTeam2 == nullptr) {
             return StatusType::FAILURE;
         }
-        std::shared_ptr<Team> newTeam(new Team(newTeamId, 0));
+        std::shared_ptr<Team> newTeam(new Team(newTeamId, foundTeam1->GetValue()->getPoints()+foundTeam2->GetValue()->getPoints()));
         if (newTeam == nullptr) {
             return StatusType::ALLOCATION_ERROR;
         }
@@ -334,21 +338,22 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         for (int i = 0; i < foundTeam1->GetValue()->getNumOfPlayers(); i++) {
             team1_players_by_id[i]->setTeam(newTeam);
             newTeam->add_player(team1_players_by_id[i]);
+            newTeam->addTo_PM_Equation(team1_players_by_id[i]->getGoals()-team1_players_by_id[i]->getCards());
         }
         foundTeam2->GetValue()->PlayersToArray(0, team2_players_by_id);
         for (int i = 0; i < foundTeam2->GetValue()->getNumOfPlayers(); i++) {
             team2_players_by_id[i]->setTeam(newTeam);
             newTeam->add_player(team2_players_by_id[i]);
+            newTeam->addTo_PM_Equation(team2_players_by_id[i]->getGoals()-team2_players_by_id[i]->getCards());
         }
-        newTeam->setPoints(foundTeam1->GetValue()->getPoints(), foundTeam2->GetValue()->getPoints());
-        //this->all_teams->Insert(newTeam);
-        //if (newTeam->getNumOfPlayers() >= 11 && newTeam->hasGk()){
-        //    all_viable_teams->Insert(newTeam);
-        //}
-       // this->all_teams->Remove(foundTeam1->GetValue());
-        //this->all_viable_teams->Remove(foundTeam1->GetValue());
-        //this->all_teams->Remove(foundTeam2->GetValue());
-        //this->all_viable_teams->Remove(foundTeam2->GetValue());
+        this->all_teams->Remove(foundTeam1->GetValue());
+        this->all_viable_teams->Remove(foundTeam1_viable->GetValue());
+        this->all_teams->Remove(foundTeam2->GetValue());
+        this->all_viable_teams->Remove(foundTeam2_viable->GetValue());
+        this->all_teams->Insert(newTeam);
+        if (newTeam->getNumOfPlayers() >= 11 && newTeam->hasGk()){
+            all_viable_teams->Insert(newTeam);
+        }
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 }
 
@@ -453,7 +458,7 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
             return {StatusType::ALLOCATION_ERROR};
         }
         auto *foundTeam = this->all_teams->Find(team);
-        if (team == nullptr) {
+        if (foundTeam == nullptr) {
             return {StatusType::FAILURE};
         }
         std::shared_ptr<Player> foundPlayer = foundTeam->GetValue()->findPlayer(playerId);
