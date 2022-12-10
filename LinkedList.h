@@ -8,15 +8,20 @@
 template<typename T> class Node{
 public:
     T data;
+    int score;
     Node* next;
     Node* prev;
     Node(T data){
         this->data = data;
         next = NULL;
         prev = NULL;
+        score = 0;
     }
     void setData(T newdata){
         data = newdata;
+    }
+    void addToScore(int to_add){
+        score = score + to_add + 3;
     }
 };
 

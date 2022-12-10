@@ -70,6 +70,16 @@ bool Team::add_player(std::shared_ptr<Player> playerToAdd)
             if (this->topScorer->getGoals() < playerToAdd->getGoals()){
                 this->topScorer = playerToAdd;
             }
+            else if (this->topScorer->getGoals() == playerToAdd->getGoals()){
+                if (this->topScorer->getCards() > playerToAdd->getCards()){
+                    topScorer = playerToAdd;
+                }
+                else if (this->topScorer->getCards() == playerToAdd->getCards()){
+                    if (this->topScorer->getId() < playerToAdd->getId()){
+                        topScorer = playerToAdd;
+                    }
+                }
+            }
         }
         this->numberOfPlayers = this->numberOfPlayers + 1;
         if (playerToAdd->isGK()){
@@ -83,17 +93,22 @@ bool Team::add_player(std::shared_ptr<Player> playerToAdd)
 
 bool Team::removePlayer(std::shared_ptr<Player> toRemove)
 {
-    if (toRemove  == topScorer){
-        topScorer = this->players_by_goals->FindMaxValInTree(players_by_goals->GetRoot())->GetValue();
+    if (toRemove->getId()  == topScorer->getId()){
+        if (this->players->GetRoot()->GetValue()->getId() != toRemove->getId()) {
+            topScorer = this->players_by_goals->Find(toRemove)->GetParent()->GetValue();
+        }
+        else{
+            topScorer = nullptr;
+        }
     }
-    this->players->Remove(toRemove);
-    this->players_by_goals->Remove(toRemove);
-    toRemove->setGamesPlayed(this->games_played+toRemove->getGamesPlayed());
-    this->numberOfPlayers = this->numberOfPlayers -1;
-    if (toRemove->isGK()){
-        this->numberOfGK += -1;
-        if (numberOfGK<= 0){
-            this->hasGK = false;
+    if (this->players->Remove(toRemove) &&  this->players_by_goals->Remove(toRemove)) {
+        toRemove->setGamesPlayed(this->games_played + toRemove->getGamesPlayed());
+        this->numberOfPlayers = this->numberOfPlayers - 1;
+        if (toRemove->isGK()) {
+            this->numberOfGK += -1;
+            if (numberOfGK <= 0) {
+                this->hasGK = false;
+            }
         }
     }
 }
