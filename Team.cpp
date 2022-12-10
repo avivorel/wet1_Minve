@@ -84,7 +84,7 @@ bool Team::add_player(std::shared_ptr<Player> playerToAdd)
 bool Team::removePlayer(std::shared_ptr<Player> toRemove)
 {
     if (toRemove  == topScorer){
-        topScorer = this->players_by_goals->Find(toRemove)->GetParent()->GetValue();
+        topScorer = this->players_by_goals->FindMaxValInTree(players_by_goals->GetRoot())->GetValue();
     }
     this->players->Remove(toRemove);
     this->players_by_goals->Remove(toRemove);

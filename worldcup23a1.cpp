@@ -22,7 +22,7 @@ world_cup_t::~world_cup_t()
 
 StatusType world_cup_t::add_team(int teamId, int points)
 {
-    if(teamId < 0 or points< 0)
+    if(teamId <= 0 or points< 0)
     {
         return StatusType::INVALID_INPUT;
     }
@@ -44,21 +44,18 @@ StatusType world_cup_t::add_team(int teamId, int points)
 
 StatusType world_cup_t::remove_team(int teamId)
 {
-    if (teamId<0){
+    if (teamId<=0){
         return StatusType::INVALID_INPUT;
     }
 
     try {
         std::shared_ptr<Team> toRemove(new Team(teamId, 0));
         auto *all_teams_remove = this->all_teams->Find(toRemove);
-        auto *viable_teams_remove = this->all_viable_teams->Find(toRemove);
-        if ((all_teams_remove == nullptr || !(all_teams_remove->GetValue()->isEmpty())) || (viable_teams_remove ==
-                nullptr || !viable_teams_remove->GetValue()->isEmpty()))
-        {
+        if ((all_teams_remove == nullptr || !(all_teams_remove->GetValue()->isEmpty()))) {
             return StatusType::FAILURE;
         }
         this->all_teams->Remove(all_teams_remove->GetValue());
-        this->all_viable_teams->Remove(viable_teams_remove->GetValue());
+        return StatusType::SUCCESS;
     }  catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 
 }
@@ -146,20 +143,29 @@ StatusType world_cup_t::remove_player(int playerId)
         std::shared_ptr<Player> toRemove(new Player(playerId, 0, 0, 0, 0, 0));
         if (toRemove == nullptr) /// delete?
             return StatusType::ALLOCATION_ERROR;
-
         auto *foundPlayer_all = this->all_players->Find(toRemove);
-        auto *foundPlayer_goals = this->all_players_by_goals->Find(toRemove);
         if (foundPlayer_all == nullptr) {
             return StatusType::FAILURE;
         }
+        std::shared_ptr<Player> toRemove_goals(new Player(foundPlayer_all->GetValue()->getId(), foundPlayer_all->GetValue()->getTeamId(),
+                                                          foundPlayer_all->GetValue()->getGamesPlayed(), foundPlayer_all->GetValue()->getGoals(),
+                                                          foundPlayer_all->GetValue()->getCards(), foundPlayer_all->GetValue()->isGK()));
+        auto *foundPlayer_goals = this->all_players_by_goals->Find(toRemove_goals);
         if (topScorer == foundPlayer_all->GetValue()) {
             topScorer = foundPlayer_all->GetValue()->getPrev();
-            foundPlayer_all->GetValue()->getPrev()->setNext(nullptr);
-        } else {
             if (foundPlayer_all->GetValue()->getPrev() != nullptr) {
+                foundPlayer_all->GetValue()->getPrev()->setNext(nullptr);
+            }
+        } else {
+            if (foundPlayer_all->GetValue()->getPrev() != nullptr && foundPlayer_all->GetValue()->getNext()!= nullptr) {
                 foundPlayer_all->GetValue()->getPrev()->setNext(foundPlayer_all->GetValue()->getNext());
                 foundPlayer_all->GetValue()->getNext()->setPrev(foundPlayer_all->GetValue()->getPrev());
-            } else { foundPlayer_all->GetValue()->getNext()->setPrev(nullptr); }
+            }
+            else {
+                if (foundPlayer_all->GetValue()->getNext() != nullptr) {
+                    foundPlayer_all->GetValue()->getNext()->setPrev(nullptr);
+                }
+            }
 
         }
         std::shared_ptr<Team> team = foundPlayer_all->GetValue()->getTeam();
