@@ -36,7 +36,7 @@ public:
     void SetParent(AVLNode<T> *parent_) { parent = parent_; }
 
     AVLNode<T> *GetParent() const { return parent; }
-
+//
     void SetHeight(int new_height) { this->height = new_height; }
 
     int GetHeight() const { return this->height; }
