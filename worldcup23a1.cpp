@@ -212,10 +212,11 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,int sc
                 new Player(player->getId(), player->getTeam()->getId(), player->getGamesPlayed() + gamesPlayed,
                            player->getGoals() + scoredGoals, player->getCards() + cardsReceived, player->isGK()));
         int team_id = player->getTeam()->getId();
+        std::shared_ptr<Team> savedTeam = player->getTeam();
         remove_player(playerId);
-        add_player(newPlayer->getId(), team_id, newPlayer->getGamesPlayed(),
+        addUpdate(newPlayer->getId(), team_id, newPlayer->getGamesPlayed(),
                    newPlayer->getGoals(),
-                   newPlayer->getCards(), newPlayer->isGK());
+                   newPlayer->getCards(), newPlayer->isGK(), savedTeam);
 
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
     //player->addTo_GamesPlayed(gamesPlayed);
@@ -586,4 +587,69 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
     delete list;
     return {StatusType::FAILURE};
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
+}
+
+StatusType world_cup_t::addUpdate(int playerId, int teamId, int gamesPlayed, int goals, int cards, bool goalKeeper,
+                            std::shared_ptr<Team> currTeam){
+    if(teamId <= 0 or playerId <= 0 or gamesPlayed<0 or goals<0 or cards< 0){
+        return StatusType::INVALID_INPUT;
+    }
+    if (gamesPlayed == 0 and (goals>0 or cards > 0))
+    {
+        return StatusType::INVALID_INPUT;
+    }
+    try
+    {
+        std::shared_ptr<Player> player = std::make_shared<Player>(playerId, teamId, gamesPlayed, goals, cards, goalKeeper);
+        if (player == nullptr)
+            return StatusType::ALLOCATION_ERROR;
+        auto *foundPlayer = this->all_players->Find(player);
+        if (foundPlayer != nullptr)
+        {
+            return StatusType::FAILURE;
+        }
+        player->setTeam(currTeam);
+        if (currTeam->add_player(player))
+        {
+            all_players_by_goals->Insert(player);
+            all_players->Insert(player);
+            if (currTeam->getNumOfPlayers() >= 11 && currTeam->hasGk())
+            {
+                this->all_viable_teams->Insert(currTeam);
+            }
+            AVLNode<std::shared_ptr<Player>> *PlayerNode = all_players_by_goals->Find(player);
+            AVLNode<std::shared_ptr<Player>> *next = all_players_by_goals->find_closest_next(all_players_by_goals->GetRoot(),PlayerNode);
+            AVLNode<std::shared_ptr<Player>> *prev = all_players_by_goals->find_closest_prev
+                    (all_players_by_goals->GetRoot(),PlayerNode);
+
+            if (prev != nullptr){
+                PlayerNode->Get()->setPrev(prev->Get());
+                prev->Get()->setNext(
+                        (all_players_by_goals->find_closest_next(all_players_by_goals->GetRoot(), prev))->Get());
+            }
+            if (next != nullptr) {
+                PlayerNode->Get()->setNext(next->Get());
+                next->Get()->setPrev(
+                        (all_players_by_goals->find_closest_prev(all_players_by_goals->GetRoot(), next))->Get());
+            }
+            if (topScorer == nullptr)
+            {
+                topScorer = player;
+            }
+            else
+            {
+                if (topScorer->getGoals() < player->getGoals())
+                {
+                    topScorer = player;
+                }
+            }
+            numberOfPlayers += 1;
+            player->getTeam()->addTo_PM_Equation(goals-cards);
+            player->addTo_GamesPlayed((-1)*(player->getTeam()->getGamesPlayed())); // good?
+
+            return StatusType::SUCCESS;
+        }
+    } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
+    return StatusType::FAILURE;
+
 }

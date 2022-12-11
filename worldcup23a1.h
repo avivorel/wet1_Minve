@@ -31,7 +31,8 @@ private:
     AVLTree<std::shared_ptr<Team>> *all_viable_teams;
     std::shared_ptr<Player> topScorer;
     int numberOfPlayers;
-
+    StatusType addUpdate(int playerId, int teamId, int gamesPlayed,
+                   int goals, int cards, bool goalKeeper, std::shared_ptr<Team> currTeam);
 
 public:
     // <DO-NOT-MODIFY> {
