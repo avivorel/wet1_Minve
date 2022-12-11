@@ -58,14 +58,12 @@ public:
         } else {
             node->prev->next = node->next;
         }
-
         // if the node to be removed is the tail
         if (node == tail) {
             tail = node->prev;
         } else {
             node->next->prev = node->prev;
         }
-
         delete node;
     }
     void deleteList() {

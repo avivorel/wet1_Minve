@@ -56,7 +56,7 @@ bool Team::isEmpty() const
     return false;
 }
 
-bool Team::add_player(std::shared_ptr<Player> playerToAdd)
+bool Team::add_player(const std::shared_ptr<Player>& playerToAdd)
 {
 
     if (this->players->Insert(playerToAdd) and this->players_by_goals->Insert(playerToAdd)) {
@@ -89,7 +89,7 @@ bool Team::add_player(std::shared_ptr<Player> playerToAdd)
     return false;
 }
 
-bool Team::removePlayer(std::shared_ptr<Player> toRemove)
+bool Team::removePlayer(const std::shared_ptr<Player>& toRemove)
 {
     if (toRemove->getId()  == topScorer->getId()){
         if (this->players->GetRoot()->GetValue()->getId() != toRemove->getId()) {
@@ -148,10 +148,6 @@ std::shared_ptr<Player> Team::findPlayer(int playerid) const {
     return foundPlayer->GetValue();
 }
 
-void Team::DelPlayers(){
-    this->players->DelAll(players->GetRoot());
-    this->players_by_goals->DelAll(players_by_goals->GetRoot());
-}
 
 Team::~Team() {
     delete players;

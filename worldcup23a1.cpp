@@ -88,7 +88,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,int
         std::shared_ptr<Team> team(new Team(teamId,0));
 
 
-        auto* foundteam = this->all_teams->Find(team);
+        auto *foundteam = this->all_teams->Find(team);
 
         if (foundteam == nullptr)
         {
@@ -575,10 +575,12 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
     }
     if (list->getHead() != nullptr) {
         int winning_team_id = list->getHead()->data->getId();
-        list->deleteList();
+        list->remove(list->getHead());
+        //list->deleteList();
+        delete list;
         return {winning_team_id};
     }
-    list->deleteList();
+    //list->deleteList();
     delete list;
     return {StatusType::FAILURE};
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}

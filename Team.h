@@ -38,8 +38,8 @@ public:
     void addTo_points(int p);
     std::shared_ptr<Player> findPlayer(int playerid) const;
     bool isEmpty() const;
-    bool add_player(std::shared_ptr<Player> playerToAdd); // true if succeeds
-    bool removePlayer(std::shared_ptr<Player> toRemove);
+    bool add_player(const std::shared_ptr<Player>& playerToAdd); // true if succeeds
+    bool removePlayer(const std::shared_ptr<Player>& toRemove);
     static int compareTeamId(const std::shared_ptr<Team> &a, const std::shared_ptr<Team> &b);
     int getTopScorer() const;
     void PlayersToArray(int number, std::shared_ptr<Player> *playersArray);
