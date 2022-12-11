@@ -11,19 +11,19 @@ class Team{};
 
 Player::Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper) :
         player_id(playerId), team_id(teamId), games_played(gamesplayed),goals(goals), cards(cards), isGoalie(isGoalKeeper),
-        team(nullptr), closest_prev(nullptr),closest_next(nullptr) {};
+        team(), closest_prev(),closest_next() {};
 
 int Player::getId() const {
     return this->player_id;
 }
 
-void Player::setTeam(std::shared_ptr<Team> newteam)
+void Player::setTeam(const std::shared_ptr<Team>& newteam)
 {
-    this->team = std::move(newteam);
+    this->team = newteam;
 }
 
 std::shared_ptr<Team> Player::getTeam() {
-    return this->team;
+    return this->team.lock();
 }
 
 int Player::getTeamId() const
@@ -98,21 +98,21 @@ void Player::setGamesPlayed(int games) {
 }
 
 void Player::setNext(std::shared_ptr<Player> next) {
-    if (next == nullptr || next == NULL){
-        this->closest_prev = nullptr;
-    }
-    this->closest_next = std::move(next);
+    //if (next == nullptr || next == NULL){
+    //    this->closest_prev = nullptr;
+   // }
+    this->closest_next = next;
 }
 void Player::setPrev(std::shared_ptr<Player> prev) {
-    if (prev == nullptr || prev == NULL){
-        this->closest_prev = nullptr;
-    }
-    this->closest_prev = std::move(prev);
+    //if (prev == nullptr || prev == NULL){
+    //    this->closest_prev = nullptr;
+    //}
+    this->closest_prev = prev;
 }
 std::shared_ptr<Player> Player::getNext() {
-    return this->closest_next;
+    return this->closest_next.lock();
 }
 std::shared_ptr<Player> Player::getPrev() {
-    return this->closest_prev;
+    return this->closest_prev.lock();
 }
 

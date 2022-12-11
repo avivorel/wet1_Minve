@@ -52,7 +52,7 @@ int Team::compareTeamId(const std::shared_ptr<Team> &a, const std::shared_ptr<Te
 
 bool Team::isEmpty() const
 {
-    if (this->players->IsEmpty()) return true;
+    if (this->players->CheckEmpty()) return true;
     return false;
 }
 
@@ -92,8 +92,8 @@ bool Team::add_player(const std::shared_ptr<Player>& playerToAdd)
 bool Team::removePlayer(const std::shared_ptr<Player>& toRemove)
 {
     if (toRemove->getId()  == topScorer->getId()){
-        if (this->players->GetRoot()->GetValue()->getId() != toRemove->getId()) {
-            topScorer = this->players_by_goals->Find(toRemove)->GetParent()->GetValue();
+        if (this->players->GetRoot()->Get()->getId() != toRemove->getId()) {
+            topScorer = this->players_by_goals->Find(toRemove)->GetParent()->Get();
         }
         else{
             topScorer = nullptr;
@@ -108,7 +108,9 @@ bool Team::removePlayer(const std::shared_ptr<Player>& toRemove)
                 this->hasGK = false;
             }
         }
+        return true;
     }
+    return false;
 }
 
 bool Team::hasGk() const
@@ -135,7 +137,7 @@ void Team::PlayersToArray(int number, std::shared_ptr<Player> *playersArray) {
     }
 }
 
-int Team::setPoints(int team1Points, int team2Points) {
+void Team::setPoints(int team1Points, int team2Points) {
     this->points = this->points+ team1Points + team2Points;
 }
 
@@ -145,11 +147,9 @@ std::shared_ptr<Player> Team::findPlayer(int playerid) const {
     if (foundPlayer == nullptr){
         return nullptr;
     }
-    return foundPlayer->GetValue();
+    return foundPlayer->Get();
 }
-
-
 Team::~Team() {
-    delete players;
-    delete players_by_goals;
+   delete players;
+   delete players_by_goals;
 }

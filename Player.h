@@ -15,9 +15,9 @@ class Player {
     int goals;
     int cards;
     bool isGoalie;
-    std::shared_ptr<Team> team;
-    std::shared_ptr<Player> closest_prev;
-    std::shared_ptr<Player> closest_next;
+    std::weak_ptr<Team> team;
+    std::weak_ptr<Player> closest_prev;
+    std::weak_ptr<Player> closest_next;
 
 public:
     Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper);
@@ -38,7 +38,7 @@ public:
     bool isGK() const;
     static int comparePlayerId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b);
     static int comparePlayerGoalsCardsId(const std::shared_ptr<Player> &a, const std::shared_ptr<Player> &b);
-    void setTeam(std::shared_ptr<Team> newteam);
+    void setTeam(const std::shared_ptr<Team>& newteam);
     std::shared_ptr<Team> getTeam();
 };
 

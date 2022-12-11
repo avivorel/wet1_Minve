@@ -33,7 +33,7 @@ public:
     int getId() const;
     bool hasGk() const;
     int getNumOfPlayers() const;
-    int setPoints(int team1Points, int team2Points);
+    void setPoints(int team1Points, int team2Points);
     int getPoints() const;
     void addTo_points(int p);
     std::shared_ptr<Player> findPlayer(int playerid) const;

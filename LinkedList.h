@@ -52,6 +52,9 @@ public:
         return this->head;
     }
     void remove(Node<T> *node) {
+        if (node == nullptr){
+            return;
+        }
         // if the node to be removed is the head
         if (node == head) {
             head = node->next;
