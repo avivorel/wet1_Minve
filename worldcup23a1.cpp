@@ -16,7 +16,10 @@ world_cup_t::world_cup_t()
 
 world_cup_t::~world_cup_t()
 {
-    // TODO: Your code goes here
+    delete all_teams;
+    delete all_players;
+    delete all_players_by_goals;
+    delete all_viable_teams;
 }
 
 
@@ -37,9 +40,8 @@ StatusType world_cup_t::add_team(int teamId, int points)
         {
             return StatusType::FAILURE;
         }
+        return StatusType::SUCCESS;
     } catch (const std::bad_alloc &) {return  StatusType::ALLOCATION_ERROR;}
-
-    return StatusType::SUCCESS;
 }
 
 StatusType world_cup_t::remove_team(int teamId)
@@ -217,20 +219,6 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,int sc
         add_player(newPlayer->getId(), team_id, newPlayer->getGamesPlayed(),
                    newPlayer->getGoals(),
                    newPlayer->getCards(), newPlayer->isGK());
-        if (next != nullptr) {
-            AVLNode<std::shared_ptr<Player>> *new_prev = all_players_by_goals->find_closest_prev(all_players_by_goals->GetRoot(),
-            all_players_by_goals->Find(next));
-            if (new_prev != nullptr) {
-                next->setPrev(new_prev->GetValue());
-            }
-        }
-        if (prev != nullptr) {
-            AVLNode<std::shared_ptr<Player>> *new_next = all_players_by_goals->find_closest_next(all_players_by_goals->GetRoot(),
-            all_players_by_goals->Find(prev));
-            if(new_next != nullptr){
-                prev->setNext(new_next->GetValue());
-            }
-        }
 
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
     //player->addTo_GamesPlayed(gamesPlayed);
@@ -346,18 +334,18 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         if (newTeam == nullptr) {
             return StatusType::ALLOCATION_ERROR;
         }
+        int team1_players_count =  foundTeam1->GetValue()->getNumOfPlayers();
+        int team2_players_count = foundTeam2->GetValue()->getNumOfPlayers();
         std::shared_ptr<Player> team1_players_by_id[foundTeam1->GetValue()->getNumOfPlayers()];
         std::shared_ptr<Player> team2_players_by_id[foundTeam2->GetValue()->getNumOfPlayers()];
         team1->PlayersToArray(0, team1_players_by_id);
-        for (int i = 0; i < foundTeam1->GetValue()->getNumOfPlayers(); i++) {
-            team1->removePlayer(team1_players_by_id[i]);
+        for (int i = 0; i < team1_players_count; i++) {
             team1_players_by_id[i]->setTeam(newTeam);
             newTeam->add_player(team1_players_by_id[i]);
             newTeam->addTo_PM_Equation(team1_players_by_id[i]->getGoals()-team1_players_by_id[i]->getCards());
         }
         team2->PlayersToArray(0, team2_players_by_id);
-        for (int i = 0; i < foundTeam2->GetValue()->getNumOfPlayers(); i++) {
-            team2->removePlayer(team2_players_by_id[i]);
+        for (int i = 0; i < team2_players_count; i++) {
             team2_players_by_id[i]->setTeam(newTeam);
             newTeam->add_player(team2_players_by_id[i]);
             newTeam->addTo_PM_Equation(team2_players_by_id[i]->getGoals()-team2_players_by_id[i]->getCards());
@@ -374,6 +362,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         if (newTeam->getNumOfPlayers() >= 11 && newTeam->hasGk()){
             all_viable_teams->Insert(newTeam);
         }
+        return StatusType::SUCCESS;
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 }
 
@@ -460,10 +449,11 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output) {
                 std::shared_ptr<Player> players[numberOfPlayers];
                 this->all_players_by_goals->ToArray(players);
                 for (int i = 0; i < numberOfPlayers; i++) {
-                    output[i] = players[numberOfPlayers - i - 1]->getId();
+                    output[i] = players[i]->getId();
                 }
             }
         }
+        return StatusType::SUCCESS;
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 }
 
@@ -589,6 +579,7 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
         return {winning_team_id};
     }
     list->deleteList();
+    delete list;
     return {StatusType::FAILURE};
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 }

@@ -19,7 +19,7 @@ int Player::getId() const {
 
 void Player::setTeam(std::shared_ptr<Team> newteam)
 {
-    this->team = std::move(newteam); //??
+    this->team = std::move(newteam);
 }
 
 std::shared_ptr<Team> Player::getTeam() {
@@ -78,17 +78,17 @@ int Player::comparePlayerGoalsCardsId(const std::shared_ptr<Player> &a, const st
     }
     else if (a->goals == b->goals){
         if(a->cards > b->cards){
-            return 1;
+            return -1;
         }
         else if (a->cards == b->cards){
             if (a->player_id == b->player_id){
                 return 0;
             }
             else{
-                return a->player_id < b->player_id ? 1 : -1;
+                return a->player_id > b->player_id ? 1 : -1;
             }
         }
-        return -1;
+        return 1;
     }
     return -1;
 }
@@ -115,3 +115,4 @@ std::shared_ptr<Player> Player::getNext() {
 std::shared_ptr<Player> Player::getPrev() {
     return this->closest_prev;
 }
+

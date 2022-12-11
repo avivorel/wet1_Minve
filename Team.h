@@ -25,7 +25,7 @@ class Team {
 
 public:
     explicit Team(int teamid, int points);
-    // להוסיף הורס
+    ~Team();
     int getGamesPlayed() const;
     void addTo_GamesPlayed(int games);
     int get_PM_Equation() const;
@@ -43,6 +43,7 @@ public:
     static int compareTeamId(const std::shared_ptr<Team> &a, const std::shared_ptr<Team> &b);
     int getTopScorer() const;
     void PlayersToArray(int number, std::shared_ptr<Player> *playersArray);
+    void DelPlayers();
 };
 
 

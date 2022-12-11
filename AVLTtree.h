@@ -125,6 +125,7 @@ public:
     void inorder_search_ll(AVLNode<T>* root, LinkedList<T> *list, T minval, T maxval);
 
     AVLNode<T>*  find_closest_prev(AVLNode<T>* root, AVLNode<T>* node);
+    void DelAll(AVLNode<T>* root);
 };
 
 template<class T>
@@ -678,6 +679,15 @@ void AVLTree<T>::inorder_search_ll(AVLNode<T>* root,LinkedList<T> *list, T minva
 
     if (compare(root->GetValue(),maxval) == -1)
         inorder_search_ll(root->GetRight(),list, minval, maxval);
+}
+template<class T>
+void AVLTree<T>::DelAll(AVLNode<T>* root) {
+    if (root == nullptr)
+        return;
+    DelAll(root->GetLeft());
+    DelAll(root->GetRight());
+    delete root;
+    root = nullptr;
 }
 
 

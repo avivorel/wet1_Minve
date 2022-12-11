@@ -15,13 +15,13 @@ class Player {
     int goals;
     int cards;
     bool isGoalie;
-    std::shared_ptr<Team> team; ////todo need *???
+    std::shared_ptr<Team> team;
     std::shared_ptr<Player> closest_prev;
     std::shared_ptr<Player> closest_next;
 
 public:
     Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper);
-    // להוסיף הורס
+    ~Player() = default;
     int getId() const;
     int getTeamId() const;
     int getGamesPlayed() const;

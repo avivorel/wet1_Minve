@@ -11,6 +11,7 @@ public:
     int score;
     Node* next;
     Node* prev;
+    ~Node() = default;
     Node(T data){
         this->data = data;
         next = NULL;
@@ -35,7 +36,7 @@ public:
         head = NULL;
         tail = NULL;
     }
-
+    ~LinkedList() = default;
     void insert(T data) {
         Node<T> *newNode = new Node<T>(data);
         if (head == NULL) {
@@ -74,7 +75,6 @@ public:
             delete current;
             current = next;
         }
-
         head = NULL;
         tail = NULL;
     }
