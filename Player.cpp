@@ -11,7 +11,7 @@ class Team{};
 
 Player::Player(int playerId, int teamId, int gamesplayed, int goals, int cards, bool isGoalKeeper) :
         player_id(playerId), team_id(teamId), games_played(gamesplayed),goals(goals), cards(cards), isGoalie(isGoalKeeper),
-        team(), closest_prev(),closest_next() {};
+        team(), closest_prev(),closest_next() {}
 
 int Player::getId() const {
     return this->player_id;

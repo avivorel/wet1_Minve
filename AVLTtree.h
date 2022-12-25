@@ -547,9 +547,7 @@ AVLNode<T>* AVLTree<T>:: find_closest_prev(AVLNode<T>* root, AVLNode<T>* node)
 {
     if (node->GetLeft() != nullptr)
         return FindMaxValueInTree(node->GetLeft());
-
     AVLNode<T>* prev = nullptr;
-
     while (root != nullptr)
     {
         if (compare(node->Get() , root->Get()) == -1)

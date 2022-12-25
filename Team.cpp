@@ -8,7 +8,7 @@
 
 Team::Team(int teamId, int points):team_id(teamId),points(points),games_played(0),numberOfPlayers(0),numberOfGK(0),
     hasGK(false),playMatchEquation(0) ,players(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerId)),
-    players_by_goals(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerGoalsCardsId)), topScorer(nullptr){};
+    players_by_goals(new AVLTree<std::shared_ptr<Player>>(Player::comparePlayerGoalsCardsId)), topScorer(nullptr){}
 
 int Team::getId() const
 {

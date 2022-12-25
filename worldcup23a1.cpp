@@ -335,8 +335,8 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         }
         int team1_players_count = foundTeam1->Get()->getNumOfPlayers();
         int team2_players_count = foundTeam2->Get()->getNumOfPlayers();
-        std::shared_ptr<Player> team1_players_by_id[foundTeam1->Get()->getNumOfPlayers()];
-        std::shared_ptr<Player> team2_players_by_id[foundTeam2->Get()->getNumOfPlayers()];
+        auto *team1_players_by_id = new std::shared_ptr<Player>[foundTeam1->Get()->getNumOfPlayers()];
+        auto *team2_players_by_id = new std::shared_ptr<Player>[foundTeam2->Get()->getNumOfPlayers()];
         team1->PlayersToArray(0, team1_players_by_id);
 
         for (int i = 0; i < team1_players_count; i++) {
@@ -365,6 +365,8 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         if (newTeam->getNumOfPlayers() >= 11 && newTeam->hasGk()){
             all_viable_teams->Insert(newTeam);
         }
+        delete[] team1_players_by_id;
+        delete[] team2_players_by_id;
         return StatusType::SUCCESS;
     } catch (const std::bad_alloc &) { return  StatusType::ALLOCATION_ERROR;}
 }
@@ -437,23 +439,25 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output) {
                     return StatusType::FAILURE;
                 } else {
                     int numbOfPlayers = foundTeam->Get()->getNumOfPlayers();
-                    std::shared_ptr<Player> players[numbOfPlayers];
+                    auto *players = new std::shared_ptr<Player>[numbOfPlayers];
                     foundTeam->Get()->PlayersToArray(1, players);
                     for (int i = 0; i < numbOfPlayers; i++) {
                         //output[i] = players[numbOfPlayers - i - 1]->getId();
                         output[i] = players[i]->getId();
                     }
+                    delete[] players;
                 }
             }
         } else {
             if (this->all_players_by_goals->CheckEmpty()) {
                 return StatusType::FAILURE;
             } else {
-                std::shared_ptr<Player> players[numberOfPlayers];
+                auto *players = new std::shared_ptr<Player>[numberOfPlayers];
                 this->all_players_by_goals->ToArray(players);
                 for (int i = 0; i < numberOfPlayers; i++) {
                     output[i] = players[i]->getId();
                 }
+                delete[] players;
             }
         }
         return StatusType::SUCCESS;
